@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ClearBill AI</title>
+<link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>ClearBill AI</h1>
+    <p class="tagline">Find the money hospitals didn't mean to bill you.</p>
+  </header>
+
+  <main>
+    <section class="upload-card">
+      <form id="analyze-form">
+        <label>
+          Itemized Bill (PDF or image)
+          <input type="file" name="bill" id="bill" accept=".pdf,image/*" required />
+        </label>
+        <label>
+          EOB (optional, but improves accuracy)
+          <input type="file" name="eob" id="eob" accept=".pdf,image/*" />
+        </label>
+        <button type="submit" id="submit-btn">Analyze Bill</button>
+      </form>
+      <p class="hint">
+        No files handy? Try the demo assets in <code>demo_assets/sample_itemized_bill.pdf</code>
+        and <code>demo_assets/sample_eob.pdf</code> — built from Stanford Health Care's own
+        public price transparency data.
+      </p>
+    </section>
+
+    <section id="results" class="hidden">
+      <div id="summary" class="summary-card"></div>
+      <div id="flags"></div>
+      <div id="letter-card" class="hidden">
+        <h2>Draft Dispute Letter</h2>
+        <textarea id="letter-text" rows="14"></textarea>
+        <div class="actions">
+          <button id="copy-btn">Copy Letter</button>
+          <button id="fax-btn">Send Fax</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="loading" class="hidden">
+      <p>Analyzing… extracting line items, checking for duplicates, cross-referencing your EOB…</p>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

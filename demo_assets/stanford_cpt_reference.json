@@ -1,0 +1,17 @@
+{
+  "source": "Stanford Health Care CMS Hospital Price Transparency file (946174066_stanford-health-care_standardcharges.json)",
+  "source_url": "https://stanfordhealthcare.org/content/dam/SHC/patientsandvisitors/pricingtransparency/946174066_stanford-health-care_standardcharges.json",
+  "last_updated_on": "2026-04-01",
+  "note": "Facility gross_charge / discounted_cash pulled directly from the published file. Used to build realistic dollar amounts for the demo bill and EOB -- not used for real patient billing.",
+  "codes": [
+    {"cpt": "99285", "description": "Emergency Care Lev5 / Trauma Center High", "gross_charge": 15270.00, "discounted_cash": 6108.00},
+    {"cpt": "99284", "description": "Emergency Care Lev4", "gross_charge": 11859.00, "discounted_cash": 4743.60},
+    {"cpt": "74177", "description": "CT Abdomen-Pelvis W Contrast", "gross_charge": 17197.00, "discounted_cash": 6878.80},
+    {"cpt": "71260", "description": "CT Thorax W Contrast", "gross_charge": 10126.00, "discounted_cash": 4050.40},
+    {"cpt": "70450", "description": "CT Head WO Contrast", "gross_charge": 7777.00, "discounted_cash": 3110.80},
+    {"cpt": "80053", "description": "HC Metabolic Pnl Comp", "gross_charge": 1243.00, "discounted_cash": 497.20},
+    {"cpt": "80048", "description": "HC Metabolic Pnl Basic", "gross_charge": 1035.00, "discounted_cash": 414.00},
+    {"cpt": "85025", "description": "HC Cbc W/Auto Diff", "gross_charge": 445.00, "discounted_cash": 178.00},
+    {"cpt": "36415", "description": "HC Venipuncture", "gross_charge": 112.00, "discounted_cash": 44.80}
+  ]
+}
