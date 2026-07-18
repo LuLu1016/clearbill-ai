@@ -1,4 +1,3 @@
-const form = document.getElementById("analyze-form");
 const resultsEl = document.getElementById("results");
 const loadingEl = document.getElementById("loading");
 const loadingText = document.getElementById("loading-text");
@@ -8,56 +7,87 @@ const letterCard = document.getElementById("letter-card");
 const letterText = document.getElementById("letter-text");
 const submitBtn = document.getElementById("submit-btn");
 
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
+}
+
 const dropzones = [
-  { id: "bill-drop", input: "bill", filenameEl: "bill-filename" },
-  { id: "eob-drop", input: "eob", filenameEl: "eob-filename" },
+  { id: "bill-drop", input: "bill", filenameEl: "bill-filename", clearBtn: "bill-clear" },
+  { id: "eob-drop", input: "eob", filenameEl: "eob-filename", clearBtn: "eob-clear" },
 ];
 
 function updateSubmitState() {
-  const billInput = document.getElementById("bill");
-  submitBtn.disabled = !billInput.files.length;
+  submitBtn.disabled = !document.getElementById("bill").files.length;
 }
 
-dropzones.forEach(({ id, input, filenameEl }) => {
-  const zone = document.getElementById(id);
-  const fileInput = document.getElementById(input);
-  const nameEl = document.getElementById(filenameEl);
+function setDropzoneFile(dz, file) {
+  const zone = document.getElementById(dz.id);
+  const fileInput = document.getElementById(dz.input);
+  const nameEl = document.getElementById(dz.filenameEl);
 
-  const showFile = (file) => {
-    if (file) {
-      zone.classList.add("has-file");
-      nameEl.textContent = file.name;
-    } else {
-      zone.classList.remove("has-file");
-      nameEl.textContent = "";
-    }
-  };
+  if (file) {
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    fileInput.files = dt.files;
+    zone.classList.add("has-file");
+    nameEl.textContent = file.name;
+  } else {
+    fileInput.value = "";
+    zone.classList.remove("has-file");
+    nameEl.textContent = "";
+  }
+  updateSubmitState();
+}
 
-  fileInput.addEventListener("change", () => {
-    showFile(fileInput.files[0]);
-    updateSubmitState();
+dropzones.forEach((dz) => {
+  const zone = document.getElementById(dz.id);
+  const fileInput = document.getElementById(dz.input);
+  const clearEl = document.getElementById(dz.clearBtn);
+
+  fileInput.addEventListener("change", () => setDropzoneFile(dz, fileInput.files[0] || null));
+
+  clearEl.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDropzoneFile(dz, null);
   });
 
   ["dragenter", "dragover"].forEach((evt) =>
-    zone.addEventListener(evt, (e) => {
-      e.preventDefault();
-      zone.classList.add("drag-over");
-    })
+    zone.addEventListener(evt, (e) => { e.preventDefault(); zone.classList.add("drag-over"); })
   );
   ["dragleave", "drop"].forEach((evt) =>
-    zone.addEventListener(evt, (e) => {
-      e.preventDefault();
-      zone.classList.remove("drag-over");
-    })
+    zone.addEventListener(evt, (e) => { e.preventDefault(); zone.classList.remove("drag-over"); })
   );
   zone.addEventListener("drop", (e) => {
     const file = e.dataTransfer.files[0];
-    if (file) {
-      fileInput.files = e.dataTransfer.files;
-      showFile(file);
-      updateSubmitState();
-    }
+    if (file) setDropzoneFile(dz, file);
   });
+});
+
+document.getElementById("load-sample-btn").addEventListener("click", async (e) => {
+  const btn = e.currentTarget;
+  const original = btn.textContent;
+  btn.textContent = "Loading…";
+  btn.disabled = true;
+  try {
+    const [billBlob, eobBlob] = await Promise.all([
+      fetch("/demo_assets/sample_itemized_bill.pdf").then((r) => r.blob()),
+      fetch("/demo_assets/sample_eob.pdf").then((r) => r.blob()),
+    ]);
+    setDropzoneFile(dropzones[0], new File([billBlob], "sample_itemized_bill.pdf", { type: "application/pdf" }));
+    setDropzoneFile(dropzones[1], new File([eobBlob], "sample_eob.pdf", { type: "application/pdf" }));
+    showToast("Sample bill and EOB loaded");
+  } catch (err) {
+    showToast("Couldn't load the sample files -- check the server console");
+  } finally {
+    btn.textContent = original;
+    btn.disabled = false;
+  }
 });
 
 const LOADING_STEPS = [
@@ -66,7 +96,6 @@ const LOADING_STEPS = [
   "Cross-referencing your EOB…",
   "Drafting your dispute letter…",
 ];
-
 let loadingInterval;
 
 function cycleLoadingText() {
@@ -78,14 +107,21 @@ function cycleLoadingText() {
   }, 1400);
 }
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+submitBtn.addEventListener("click", async () => {
+  const billInput = document.getElementById("bill");
+  const eobInput = document.getElementById("eob");
+  if (!billInput.files.length) return;
+
   resultsEl.classList.add("hidden");
   loadingEl.classList.remove("hidden");
+  loadingEl.scrollIntoView({ behavior: "smooth", block: "center" });
   submitBtn.disabled = true;
   cycleLoadingText();
 
-  const formData = new FormData(form);
+  const formData = new FormData();
+  formData.append("bill", billInput.files[0]);
+  if (eobInput.files.length) formData.append("eob", eobInput.files[0]);
+
   try {
     const res = await fetch("/api/analyze", { method: "POST", body: formData });
     const data = await res.json();
@@ -150,7 +186,7 @@ function renderResults(data) {
           ${amount ? `<span class="flag-amount">${amount}</span>` : ""}
         </div>
         <p class="flag-explanation">${escapeHtml(f.explanation)}</p>
-        <div class="flag-meta">CPT ${escapeHtml(f.code)} · ${escapeHtml(f.date)} · ${escapeHtml(f.confidence)} confidence</div>
+        <div class="flag-meta">CPT ${escapeHtml(f.code)} &middot; ${escapeHtml(f.date)} &middot; ${escapeHtml(f.confidence)} confidence</div>
       `;
       flagsWrap.appendChild(div);
     });
@@ -166,16 +202,19 @@ function renderResults(data) {
   resultsEl.classList.remove("hidden");
 }
 
-document.getElementById("copy-btn")?.addEventListener("click", (e) => {
+document.getElementById("copy-btn")?.addEventListener("click", () => {
   navigator.clipboard.writeText(letterText.value);
-  const btn = e.currentTarget;
-  const original = btn.textContent;
-  btn.textContent = "Copied!";
-  setTimeout(() => (btn.textContent = original), 1200);
+  showToast("Letter copied to clipboard");
 });
 
 document.getElementById("fax-btn")?.addEventListener("click", async () => {
   const res = await fetch("/api/send-fax", { method: "POST" });
   const data = await res.json();
-  alert(data.message);
+  showToast(data.message);
+});
+
+document.getElementById("reset-btn")?.addEventListener("click", () => {
+  resultsEl.classList.add("hidden");
+  dropzones.forEach((dz) => setDropzoneFile(dz, null));
+  window.scrollTo({ top: 0, behavior: "smooth" });
 });

@@ -19,11 +19,12 @@ rules on its own.
 import json
 import os
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, send_from_directory
 from google import genai
 from google.genai import types
 
 app = Flask(__name__)
+DEMO_ASSETS_DIR = os.path.join(os.path.dirname(__file__), "demo_assets")
 
 MODEL = "gemini-2.5-flash"
 _client = None
@@ -165,6 +166,14 @@ def draft_dispute_letter(bill_items: list[dict], flags: list[dict]) -> str:
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
+@app.route("/demo_assets/<path:filename>")
+def demo_assets(filename):
+    """Serves the sample bill/EOB so the UI's "Use sample files" button can
+    fetch real bytes and hand them to /api/analyze -- not a canned response,
+    an actual round trip through the same code path a real upload takes."""
+    return send_from_directory(DEMO_ASSETS_DIR, filename)
 
 
 @app.route("/api/analyze", methods=["POST"])

@@ -13,43 +13,91 @@
     <p class="tagline">Find the money hospitals didn't mean to bill you.</p>
   </header>
 
+  <section class="stat-strip" aria-label="Why this matters">
+    <div class="stat-strip-item">
+      <div class="stat-strip-value">49&ndash;80%</div>
+      <div class="stat-strip-label">of medical bills contain an error</div>
+    </div>
+    <div class="stat-strip-item">
+      <div class="stat-strip-value">$1,300</div>
+      <div class="stat-strip-label">avg. overcharge on a $10k+ bill</div>
+    </div>
+    <div class="stat-strip-item">
+      <div class="stat-strip-value">60 sec</div>
+      <div class="stat-strip-label">to check yours, free</div>
+    </div>
+  </section>
+  <p class="stat-source">Sources: Medical Bill Rescue, Aptarro Healthcare Billing Statistics 2026</p>
+
+  <div class="perforation" aria-hidden="true"></div>
+
   <main>
-    <section class="card">
-      <form id="analyze-form">
-        <div class="dropzone-group">
-          <label class="dropzone" id="bill-drop" for="bill">
-            <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M9 12h6m-6 4h6M9 8h1M6 3h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            <div class="dropzone-label">Itemized Bill</div>
-            <div class="dropzone-hint">PDF or photo · required</div>
-            <div class="dropzone-filename" id="bill-filename"></div>
-            <input type="file" name="bill" id="bill" accept=".pdf,image/*" required />
-          </label>
-
-          <label class="dropzone" id="eob-drop" for="eob">
-            <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M9 12h6m-6 4h6M9 8h1M6 3h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            <div class="dropzone-label">EOB</div>
-            <div class="dropzone-hint">Optional · improves accuracy</div>
-            <div class="dropzone-filename" id="eob-filename"></div>
-            <input type="file" name="eob" id="eob" accept=".pdf,image/*" />
-          </label>
+    <section class="how-it-works" aria-label="How it works">
+      <div class="how-step">
+        <span class="how-num">1</span>
+        <div>
+          <div class="how-title">Upload</div>
+          <div class="how-desc">Your itemized bill, and your EOB if you have one</div>
         </div>
+      </div>
+      <div class="how-step">
+        <span class="how-num">2</span>
+        <div>
+          <div class="how-title">We check it</div>
+          <div class="how-desc">Duplicate charges, and anything your insurer already denied</div>
+        </div>
+      </div>
+      <div class="how-step">
+        <span class="how-num">3</span>
+        <div>
+          <div class="how-title">You dispute it</div>
+          <div class="how-desc">A ready-to-send letter citing the exact lines and codes</div>
+        </div>
+      </div>
+    </section>
 
-        <button type="submit" id="submit-btn" class="btn-primary" disabled>Analyze Bill</button>
-      </form>
+    <section class="card">
+      <div class="dropzone-group">
+        <label class="dropzone" id="bill-drop" for="bill">
+          <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M9 12h6m-6 4h6M9 8h1M6 3h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <div class="dropzone-label">Itemized Bill</div>
+          <div class="dropzone-hint">PDF or photo &middot; required</div>
+          <div class="dropzone-filename-row">
+            <span class="dropzone-filename" id="bill-filename"></span>
+            <button type="button" class="dropzone-clear" id="bill-clear" aria-label="Remove itemized bill file">&times;</button>
+          </div>
+          <input type="file" name="bill" id="bill" accept=".pdf,image/*" required />
+        </label>
+
+        <label class="dropzone" id="eob-drop" for="eob">
+          <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M9 12h6m-6 4h6M9 8h1M6 3h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <div class="dropzone-label">EOB</div>
+          <div class="dropzone-hint">Optional &middot; improves accuracy</div>
+          <div class="dropzone-filename-row">
+            <span class="dropzone-filename" id="eob-filename"></span>
+            <button type="button" class="dropzone-clear" id="eob-clear" aria-label="Remove EOB file">&times;</button>
+          </div>
+          <input type="file" name="eob" id="eob" accept=".pdf,image/*" />
+        </label>
+      </div>
+
+      <div class="btn-row">
+        <button type="button" id="submit-btn" class="btn-primary" disabled>Analyze Bill</button>
+        <button type="button" class="btn-ghost" id="load-sample-btn">Use sample bill</button>
+      </div>
       <p class="hint">
-        No files handy? Try <code>demo_assets/sample_itemized_bill.pdf</code> and
-        <code>demo_assets/sample_eob.pdf</code> — built from Stanford Health Care's own
-        public price transparency data.
+        The sample loads Stanford Health Care's own real published prices, with a real
+        duplicate charge injected &mdash; so you can see it catch something true.
       </p>
     </section>
 
-    <section id="loading" class="card hidden">
+    <section id="loading" class="card hidden" aria-live="polite">
       <div class="spinner"></div>
-      <p id="loading-text">Extracting line items…</p>
+      <p id="loading-text">Extracting line items&hellip;</p>
     </section>
 
     <section id="results" class="hidden">
@@ -57,19 +105,24 @@
       <div id="flags-wrap"></div>
       <div id="letter-card" class="card hidden">
         <h2>Draft Dispute Letter</h2>
-        <p class="letter-sub">Ready to copy, print, or fax. Review before sending.</p>
+        <p class="letter-sub">Edit anything before you send it &mdash; this is a starting point, not a final draft.</p>
         <textarea id="letter-text" spellcheck="false"></textarea>
         <div class="actions">
           <button id="copy-btn" class="btn-secondary">Copy Letter</button>
           <button id="fax-btn" class="btn-secondary">Send Fax</button>
         </div>
       </div>
+      <div class="btn-row">
+        <button type="button" class="btn-ghost" id="reset-btn" style="flex:1;">Start over</button>
+      </div>
     </section>
   </main>
 
   <footer>
-    Prototype for the Stanford × DeepMind Hackathon. Not legal or medical billing advice.
+    Prototype for the Stanford &times; DeepMind Hackathon. Not legal or medical billing advice.
   </footer>
+
+  <div id="toast" role="status"></div>
 
   <script src="/static/app.js"></script>
 </body>
