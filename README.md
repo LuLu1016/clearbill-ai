@@ -55,7 +55,31 @@ cp .env.example .env   # add your Gemini API key from https://aistudio.google.co
 python app.py
 ```
 
+`.env` is loaded automatically at startup (python-dotenv) — no need to export
+anything manually. If the key is missing the app still boots and serves the UI,
+logs a warning, and `/api/analyze` returns a clear error instead of crashing.
+On Cloud Run, real environment variables are used as-is; a `.env` file isn't
+needed and won't override them.
+
 Open http://localhost:8080, upload the two files from `demo_assets/`, click Analyze.
+
+## Tests
+
+```bash
+pip install -r requirements-dev.txt
+pytest tests/
+```
+
+The suite runs the full pipeline through the Flask endpoint with Gemini replaced
+by recorded real responses — deterministic, no API key, no quota spend. It
+verifies extraction plumbing, duplicate detection, the bill-vs-EOB denial join,
+the no-double-count total, and that the letter is grounded in the actual flags.
+
+Before demo day, run the true end-to-end once (3 real Gemini calls):
+
+```bash
+RUN_LIVE_GEMINI=1 pytest tests/ -k live
+```
 
 ## Deploy
 
@@ -76,26 +100,54 @@ gcloud run deploy clearbill-ai \
   --source . \
   --region us-central1 \
   --allow-unauthenticated \
-  --set-env-vars GEMINI_API_KEY=YOUR_KEY
+  --timeout 120 \
+  --set-env-vars GEMINI_API_KEY=YOUR_KEY,FAX_PROVIDER=dryrun
 ```
 
 Cloud Run builds the `Dockerfile` automatically. Grab the printed URL — that's your
 "Hosted Prototype" link for submission.
 
-## Auto-fax (not wired up)
+Notes:
 
-`/api/send-fax` is a stub (`app.py`). To make it real, pick a fax API
-(Documo/mFax, Notifyre, Sfax, eFax API) and:
+- `--timeout 120` matters: one analysis makes three sequential Gemini calls
+  (~20–60s total); the gunicorn worker timeout in the Dockerfile is set to match.
+- Secrets are injected at runtime — `.env` is excluded from the image by
+  `.dockerignore`, never baked in. For anything beyond a hackathon, prefer
+  `--set-secrets GEMINI_API_KEY=gemini-key:latest` (Secret Manager) over
+  `--set-env-vars`.
+- Health check: `GET /healthz` returns `{"status": "ok", "gemini_key_configured": true}`
+  without spending a Gemini call — use it to verify the deploy landed with a key.
+- The hosted page links the sample bill/EOB for download (served at
+  `/demo_assets/…`), so judges can try the flow without a bill of their own.
+- Make sure the key you deploy with is **paid tier** — the free tier's
+  20 requests/day/model dies mid-demo.
 
-1. Sign up, get an API key, add it to `.env`
-2. In `send_fax()`, POST the letter (render to PDF first — `reportlab` is already a
-   dependency of `demo_assets/generate_demo_docs.py`, reuse the pattern) to the
-   provider's send endpoint with the destination fax number
-3. If you build the outbound-voice-call variant instead (Gemini Live API + Twilio
-   Voice), open the call with a spoken disclosure ("this call may be recorded") —
-   California is a two-party-consent state for call recording, and Stanford Health
-   Care's own billing page already has a TCPA section, so plan on this being asked
-   about by judges.
+## Auto-fax
+
+`/api/send-fax` renders the dispute letter to PDF (reportlab) and sends it via a
+pluggable provider (`fax_providers.py`). Configure in `.env`:
+
+```bash
+FAX_PROVIDER=dryrun    # dryrun | documo | notifyre
+FAX_API_KEY=           # required for documo/notifyre; from the provider dashboard
+```
+
+- **dryrun** (default) writes the PDF to `./outbox/` instead of faxing — the full
+  flow works with no account and nothing is ever sent. Use this for all testing.
+- **documo / notifyre** POST to the provider's send API. Written from their docs
+  but not yet exercised against a live account — when you sign up, confirm the
+  endpoint/payload against current docs before relying on it on stage.
+- Swapping in another vendor = one new subclass in `fax_providers.py`; `app.py`
+  doesn't change.
+
+**Never fax a real hospital's number during testing.** Point real providers at
+your own test fax inbox until there's an actual dispute to send.
+
+If you build the outbound-voice-call variant instead (Gemini Live API + Twilio
+Voice), open the call with a spoken disclosure ("this call may be recorded") —
+California is a two-party-consent state for call recording, and Stanford Health
+Care's own billing page already has a TCPA section, so plan on this being asked
+about by judges.
 
 ## Architecture
 

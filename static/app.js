@@ -207,6 +207,7 @@ document.getElementById("copy-btn")?.addEventListener("click", () => {
   showToast("Letter copied to clipboard");
 });
 
+<<<<<<< HEAD
 document.getElementById("fax-btn")?.addEventListener("click", async () => {
   const res = await fetch("/api/send-fax", { method: "POST" });
   const data = await res.json();
@@ -217,4 +218,31 @@ document.getElementById("reset-btn")?.addEventListener("click", () => {
   resultsEl.classList.add("hidden");
   dropzones.forEach((dz) => setDropzoneFile(dz, null));
   window.scrollTo({ top: 0, behavior: "smooth" });
+=======
+document.getElementById("fax-btn")?.addEventListener("click", async (e) => {
+  const faxNumber = prompt(
+    "Fax number for the hospital's billing department (e.g. +16505551234).\n" +
+      "Never use a real hospital's number for testing."
+  );
+  if (!faxNumber) return;
+
+  const btn = e.currentTarget;
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Sending…";
+  try {
+    const res = await fetch("/api/send-fax", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ letter: letterText.value, fax_number: faxNumber }),
+    });
+    const data = await res.json();
+    alert(data.message);
+  } catch (err) {
+    alert(`Fax request failed: ${err}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+>>>>>>> 64fe36f (update)
 });

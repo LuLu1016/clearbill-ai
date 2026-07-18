@@ -1,0 +1,17 @@
+# Never bake secrets into the image -- Cloud Run injects env vars at runtime.
+.env
+.env.*
+!.env.example
+
+venv/
+node_modules/
+outbox/
+__pycache__/
+*.pyc
+.git/
+.claude/
+.DS_Store
+*.docx
+preview/
+IDEA_9_LOG.md
+STEP_BY_STEP_PLAN.md
