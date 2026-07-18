@@ -3,7 +3,7 @@ Generates two SYNTHETIC demo documents for the ClearBill AI hackathon prototype:
   - sample_itemized_bill.pdf
   - sample_eob.pdf
 
-All dollar figures are real, publicly published Stanford Health Care gross
+Most dollar figures are real, publicly published Stanford Health Care gross
 charges / cash prices, pulled from SHC's CMS-mandated price transparency
 file (946174066_stanford-health-care_standardcharges.json, updated 2026-04-01).
 The patient, account numbers, physician names, and the encounter itself are
@@ -15,6 +15,41 @@ claim/service"), the standard national Claim Adjustment Reason Code
 maintained at x12.org/codes/claim-adjustment-reason-codes -- real EOBs use
 this exact code for duplicate-billing denials, which is why it's worth
 reproducing here rather than inventing a fake one.
+
+This bill is built to trip all three deterministic checks in app.py, each
+grounded in a different real, independently verifiable source:
+
+1. Duplicate charge (36415 x2 as separate lines) -- plain same-code-same-date
+   logic, no external data needed.
+2. MUE exceeded (80053 billed at qty=2 on one line) -- CPT 80053's real MUE
+   (Medically Unlikely Edit) limit is 1 unit/day per CMS's own Facility
+   Outpatient Hospital Services MUE table, effective 2026-07-01
+   (data/raw/MCR_MUE_OutpatientHospitalServices_Eff_07-01-2026.csv). Using a
+   single line with qty=2 (not two separate lines) is deliberate: it's a
+   pattern find_duplicate_charges() can't catch, so this line demonstrates
+   the MUE check's distinct value, not overlapping detection.
+3. Unbundling / PTP edit (0691T + 74177 same date) -- verified against the
+   real CMS NCCI Column1/Column2 edit file (data/raw/ccioph-v322r0-f1.txt):
+   row "0691T	74177		20220101	*	0	CPT Manual or CMS manual coding
+   instruction" -- Column 1 = 0691T, Column 2 = 74177, modifier indicator
+   "0" (hard rule, no modifier can excuse billing both same-day), still
+   active (no deletion date) as of this bill's 2026-07-10 service date.
+   0691T is a real CPT Category III code: "Automated analysis of an
+   existing CT dataset for vertebral fracture(s), including assessment of
+   bone density when performed" -- i.e. AI-based post-processing of a CT
+   scan the patient already had. The narrative writes itself: the hospital
+   billed the CT (74177) AND a separate line for running an automated
+   fracture-detection pass on that same scan (0691T), which CMS's own edit
+   table says can't be billed separately.
+
+   IMPORTANT PRICING CAVEAT: 0691T does not appear in
+   stanford_cpt_reference.json (SHC's published file has no entry for it,
+   likely because it's a rare/newer add-on code). Its $850.00/$340.00
+   gross/cash prices below are an ILLUSTRATIVE ESTIMATE only -- everything
+   else in LINE_ITEMS is a real SHC-published price. Don't present the
+   0691T dollar amount as sourced; the CODE PAIR + rule violation is what's
+   verified real, not this specific number. Replace with a real SHC price
+   if one is ever found for this code.
 """
 
 from reportlab.lib.pagesizes import letter
@@ -52,15 +87,20 @@ LINE_ITEMS = [
     # date, cpt, description, qty, unit_charge
     ("07/10/2026", "99285", "Emergency Dept Visit, High Complexity / Trauma", 1, 15270.00),
     ("07/10/2026", "74177", "CT Abdomen-Pelvis with Contrast", 1, 17197.00),
-    ("07/10/2026", "80053", "Comprehensive Metabolic Panel", 1, 1243.00),
+    ("07/10/2026", "0691T", "Automated CT Analysis, Vertebral Fracture/Bone Density", 1, 850.00),  # injected PTP unbundling (real edit vs 74177, see module docstring)
+    ("07/10/2026", "80053", "Comprehensive Metabolic Panel", 2, 1243.00),  # injected MUE excess: real limit is 1/day, billed at qty=2
     ("07/10/2026", "85025", "CBC with Automated Differential", 1, 445.00),
     ("07/10/2026", "36415", "Venipuncture, Routine Collection", 1, 112.00),
     ("07/10/2026", "36415", "Venipuncture, Routine Collection", 1, 112.00),  # injected duplicate
 ]
 
-ALLOWED = {  # SHC's own published discounted cash price, used as EOB "allowed amount"
+ALLOWED = {  # SHC's own published discounted cash price, used as EOB "allowed amount".
+    # 0691T is the one exception -- see module docstring's PRICING CAVEAT; its
+    # $340 "allowed" amount follows the same ~40%-of-gross ratio as the real
+    # entries below purely for visual consistency, not because it's sourced.
     "99285": 6108.00,
     "74177": 6878.80,
+    "0691T": 340.00,
     "80053": 497.20,
     "85025": 178.00,
     "36415": 44.80,
@@ -290,9 +330,10 @@ def build_bill():
     story.append(
         Paragraph(
             "SYNTHETIC DEMO DOCUMENT -- generated for the Stanford x DeepMind Hackathon "
-            "(ClearBill AI). Patient, provider, and account information is fictional. Dollar "
-            "amounts are real Stanford Health Care gross charges published under the CMS "
-            "Hospital Price Transparency Rule (45 CFR 180.50), file dated 2026-04-01.",
+            "(ClearBill AI). Patient, provider, and account information is fictional. Most "
+            "dollar amounts are real Stanford Health Care gross charges published under the "
+            "CMS Hospital Price Transparency Rule (45 CFR 180.50), file dated 2026-04-01; the "
+            "CPT 0691T line is an illustrative price estimate (see generate_demo_docs.py).",
             styles["FineCenter"],
         )
     )
@@ -332,7 +373,13 @@ def build_eob(bill_total):
     seen_36415 = 0
     for date, cpt, desc, qty, unit in LINE_ITEMS:
         amount = qty * unit
-        allowed = ALLOWED[cpt]
+        # Scale the allowed amount by qty too, so lines billed at qty>1 (the
+        # injected MUE-excess line) get adjudicated normally by the payer --
+        # deliberately: this insurer's system does NOT catch the MUE issue,
+        # so ClearBill AI's own check against CMS's real MUE table is what
+        # catches something the EOB alone would miss. Same reasoning for
+        # 0691T's PTP unbundling -- no special remark here on purpose.
+        allowed = ALLOWED[cpt] * qty
         if cpt == "36415":
             seen_36415 += 1
         if cpt == "36415" and seen_36415 == 2:
@@ -408,4 +455,10 @@ if __name__ == "__main__":
     patient_resp = build_eob(total)
     print(f"Bill total: ${total:,.2f}")
     print(f"EOB patient responsibility: ${patient_resp:,.2f}")
-    print(f"Duplicate-charge overcharge ClearBill AI should catch: $112.00 (CPT 36415, denied by insurer via CARC 18, still billed)")
+    print("Flags ClearBill AI should catch on this bill:")
+    print("  1. duplicate_charge:        CPT 36415 billed twice as separate lines ($112 overcharge)")
+    print("  2. denied_but_still_billed: EOB denies the 2nd 36415 via CARC 18, bill still shows it")
+    print("  3. mue_exceeded:            CPT 80053 billed qty=2 in one line; real CMS MUE limit is 1/day")
+    print("                              (data/raw/MCR_MUE_OutpatientHospitalServices_Eff_07-01-2026.csv)")
+    print("  4. unbundling:              CPT 0691T + 74177 same date; real CMS PTP edit, modifier")
+    print("                              indicator 0 (data/raw/ccioph-v322r0-f1.txt)")

@@ -1,0 +1,8 @@
+"FAKE fixture -- mimics the real CMS MUE file layout: quoted preamble
+spanning multiple lines, then a header row, then data rows. Fake codes only.",,,
+"HCPCS/
+CPT Code",MUE Values,MUE Adjudication Indicator,MUE Rationale
+00000,1,3 Date of Service Edit: Clinical,fake rationale (test only)
+00001,4,3 Date of Service Edit: Clinical,fake rationale (test only)
+99999,2,3 Date of Service Edit: Clinical,fake rationale (test only)
+99997,0,3 Date of Service Edit: Clinical,fake rationale (test only)

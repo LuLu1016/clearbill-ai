@@ -89,8 +89,30 @@ def fake():
 @pytest.fixture
 def client(fake, monkeypatch):
     monkeypatch.setattr(clearbill, "get_client", lambda: fake)
+    # Pipeline tests must not depend on which CMS reference files a teammate
+    # happens to have in data/raw/ -- pin both tables empty here; the
+    # unbundling/MUE tests below inject their own small in-memory tables.
+    monkeypatch.setattr(clearbill, "get_ptp_table", dict)
+    monkeypatch.setattr(clearbill, "get_mue_table", dict)
     clearbill.app.config["TESTING"] = True
     return clearbill.app.test_client()
+
+
+def _ptp_record(indicator, eff="20200101", deleted="", rationale="fake rationale (test only)"):
+    return {
+        "modifier_indicator": indicator,
+        "effective_date": eff,
+        "deletion_date": deleted,
+        "rationale": rationale,
+    }
+
+
+def _line(code, amount, modifier="", date="2026-07-10", units=None):
+    item = {"date": date, "code": code, "modifier": modifier,
+            "description": f"Fake service {code}", "amount": amount}
+    if units is not None:
+        item["units"] = units
+    return item
 
 
 def post_analyze(client, with_eob=True):
@@ -142,6 +164,29 @@ def test_full_pipeline(client, fake):
     assert "36415" in prompt
 
 
+def test_unbundling_and_mue_are_noop_without_real_cms_files(fake, monkeypatch):
+    """Proof that check_unbundling()/check_mue() change nothing observable
+    until the real CMS files land in data/raw/: on the demo bill + EOB the
+    flags are exactly what they were before this work. Uses the REAL table
+    loaders (not the client fixture's empty-table pin), so it only runs
+    where the files are genuinely absent."""
+    for path in (clearbill.PTP_EDITS_PATH, clearbill.MUE_TABLE_PATH):
+        if os.path.exists(path):
+            pytest.skip(f"real CMS file present at {path} -- no-op premise no longer applies")
+
+    monkeypatch.setattr(clearbill, "get_client", lambda: fake)
+    monkeypatch.setattr(clearbill, "_ptp_table", None)
+    monkeypatch.setattr(clearbill, "_mue_table", None)
+    client = clearbill.app.test_client()
+    resp, body = post_analyze(client)
+    assert resp.status_code == 200, body
+    flag_types = {f["type"] for f in body["flags"]}
+    assert flag_types == {"duplicate_charge", "denied_but_still_billed"}, body["flags"]
+    assert "unbundling" not in flag_types
+    assert "mue_exceeded" not in flag_types
+    assert body["total_flagged_amount"] == 112.0
+
+
 def test_bill_only_still_flags_duplicates(client):
     resp, body = post_analyze(client, with_eob=False)
     assert resp.status_code == 200
@@ -156,6 +201,8 @@ def test_clean_bill_produces_no_flags_and_no_letter(monkeypatch):
     clean_eob = [i for i in EOB_ITEMS if i["denial_status"] != "denied"]
     fake = FakeGemini(clean, clean_eob)
     monkeypatch.setattr(clearbill, "get_client", lambda: fake)
+    monkeypatch.setattr(clearbill, "get_ptp_table", dict)
+    monkeypatch.setattr(clearbill, "get_mue_table", dict)
     client = clearbill.app.test_client()
     resp, body = post_analyze(client)
     assert resp.status_code == 200
@@ -193,6 +240,142 @@ def test_cross_check_joins_on_normalized_key():
     denied = [_eob(" 36415 ", 112.0, "denied", 0.0, carc="18")]
     flags = clearbill.cross_check_eob(BILL_ITEMS, denied)
     assert len(flags) == 1 and flags[0]["overcharge_amount"] == 112.0
+
+
+# --- Unbundling / MUE checks (small in-memory tables via monkeypatch, so no
+# test depends on the 475K-row CMS download being present) -------------------
+
+def test_unbundling_indicator_0_always_flags(monkeypatch):
+    monkeypatch.setattr(clearbill, "get_ptp_table",
+                        lambda: {("00000", "00001"): [_ptp_record("0")]})
+    flags = clearbill.check_unbundling([_line("00000", 100.0), _line("00001", 40.0)])
+    assert len(flags) == 1
+    f = flags[0]
+    assert f["type"] == "unbundling" and f["confidence"] == "high"
+    assert f["code"] == "00001"  # the Column 2 code is the disputed line
+    assert f["overcharge_amount"] == 40.0
+    assert "CMS NCCI PTP edit" in f["explanation"]
+    assert "fake rationale (test only)" in f["explanation"]  # CMS rationale cited
+
+
+def test_unbundling_pair_matches_in_both_orders(monkeypatch):
+    monkeypatch.setattr(clearbill, "get_ptp_table",
+                        lambda: {("99999", "00001"): [_ptp_record("0")]})
+    # bill lists the codes in the opposite order to the table's (col1, col2)
+    flags = clearbill.check_unbundling([_line("00001", 40.0), _line("99999", 100.0)])
+    assert len(flags) == 1 and flags[0]["code"] == "00001"
+
+
+def test_unbundling_indicator_1_suppressed_by_modifier(monkeypatch):
+    monkeypatch.setattr(clearbill, "get_ptp_table",
+                        lambda: {("00000", "00001"): [_ptp_record("1")]})
+    with_mod = [_line("00000", 100.0), _line("00001", 40.0, modifier="59")]
+    without_mod = [_line("00000", 100.0), _line("00001", 40.0)]
+    assert clearbill.check_unbundling(with_mod) == []
+    assert len(clearbill.check_unbundling(without_mod)) == 1
+
+
+def test_unbundling_indicator_9_never_flags(monkeypatch):
+    monkeypatch.setattr(clearbill, "get_ptp_table",
+                        lambda: {("00000", "00001"): [_ptp_record("9")]})
+    assert clearbill.check_unbundling([_line("00000", 100.0), _line("00001", 40.0)]) == []
+
+
+def test_unbundling_respects_effective_and_deletion_window(monkeypatch):
+    # bill date of service is 2026-07-10 -> dos 20260710
+    not_yet = {("00000", "00001"): [_ptp_record("0", eff="20270101")]}
+    expired = {("00000", "00001"): [_ptp_record("0", deleted="20251231")]}
+    active = {("00000", "00001"): [_ptp_record("0", deleted="20261231")]}
+    items = [_line("00000", 100.0), _line("00001", 40.0)]
+    for table, expected in ((not_yet, 0), (expired, 0), (active, 1)):
+        monkeypatch.setattr(clearbill, "get_ptp_table", lambda t=table: t)
+        assert len(clearbill.check_unbundling(items)) == expected, table
+
+
+def test_unbundling_picks_the_window_covering_the_service_date(monkeypatch):
+    """Real-file behavior: a pair deleted then re-added has two records,
+    newest first. The record whose window covers the date of service must
+    win -- not just whichever the parser saw first/last."""
+    table = {("00000", "00001"): [
+        _ptp_record("1", eff="20260101"),                      # current window
+        _ptp_record("0", eff="20250101", deleted="20251231"),  # old window
+    ]}
+    monkeypatch.setattr(clearbill, "get_ptp_table", lambda: table)
+    # dos 2026-07-10 -> current window ("1") applies; with a modifier on a
+    # line it must be suppressed. If the old "0" record were wrongly used,
+    # the modifier wouldn't matter and this would flag.
+    items = [_line("00000", 100.0), _line("00001", 40.0, modifier="59")]
+    assert clearbill.check_unbundling(items) == []
+    # dos inside the old window -> the "0" record applies and modifier is moot
+    old = [_line("00000", 100.0, date="2025-06-15"),
+           _line("00001", 40.0, date="2025-06-15", modifier="59")]
+    assert len(clearbill.check_unbundling(old)) == 1
+
+
+def test_unbundling_requires_same_date(monkeypatch):
+    monkeypatch.setattr(clearbill, "get_ptp_table",
+                        lambda: {("00000", "00001"): [_ptp_record("0")]})
+    items = [_line("00000", 100.0), _line("00001", 40.0, date="2026-07-11")]
+    assert clearbill.check_unbundling(items) == []
+
+
+def test_mue_flags_when_summed_units_exceed_max(monkeypatch):
+    monkeypatch.setattr(clearbill, "get_mue_table", lambda: {"00001": 2})
+    # 3 units across two lines of the same code+date; limit is 2
+    flags = clearbill.check_mue([_line("00001", 80.0, units=2), _line("00001", 40.0, units=1)])
+    assert len(flags) == 1
+    f = flags[0]
+    assert f["type"] == "mue_exceeded" and f["confidence"] == "high"
+    assert f["units_billed"] == 3 and f["max_units_per_day"] == 2
+    assert "CMS MUE" in f["explanation"]
+    assert f["overcharge_amount"] == 40.0  # the third unit = the second line
+
+
+def test_mue_missing_units_field_counts_as_one(monkeypatch):
+    monkeypatch.setattr(clearbill, "get_mue_table", lambda: {"00001": 2})
+    # recorded extractions predating the units field: 3 lines = 3 units
+    lines = [_line("00001", 40.0), _line("00001", 40.0), _line("00001", 40.0)]
+    flags = clearbill.check_mue(lines)
+    assert len(flags) == 1 and flags[0]["units_billed"] == 3
+    assert flags[0]["overcharge_amount"] == 40.0
+    assert clearbill.check_mue(lines[:2]) == []  # at the limit -> no flag
+
+
+def test_mue_zero_limit_flags_any_billing(monkeypatch):
+    # a real MUE value of 0 means "never billable" -- one unit must flag
+    monkeypatch.setattr(clearbill, "get_mue_table", lambda: {"99997": 0})
+    flags = clearbill.check_mue([_line("99997", 25.0, units=1)])
+    assert len(flags) == 1 and flags[0]["overcharge_amount"] == 25.0
+
+
+def test_unbundling_and_mue_flags_flow_through_analyze_endpoint(monkeypatch):
+    """End to end: injected tables + a bill containing a bundled pair and an
+    over-limit code -> both flags appear in /api/analyze output, join the
+    dedup total, and ground the dispute letter."""
+    bill = BILL_ITEMS + [
+        _line("00000", 100.0), _line("00001", 40.0),   # bundled pair
+        _line("99997", 25.0, units=3),                  # MUE limit 1
+    ]
+    fake = FakeGemini(bill, EOB_ITEMS)
+    monkeypatch.setattr(clearbill, "get_client", lambda: fake)
+    monkeypatch.setattr(clearbill, "get_ptp_table",
+                        lambda: {("00000", "00001"): [_ptp_record("0")]})
+    monkeypatch.setattr(clearbill, "get_mue_table", lambda: {"99997": 1})
+    client = clearbill.app.test_client()
+
+    resp, body = post_analyze(client)
+    assert resp.status_code == 200, body
+    flag_types = {f["type"] for f in body["flags"]}
+    assert {"unbundling", "mue_exceeded"} <= flag_types
+    # pre-existing flags unaffected
+    assert {"duplicate_charge", "denied_but_still_billed"} <= flag_types
+    # dedup total: 112.0 (36415 line) + 40.0 (00001) + 2 excess units of 99997
+    mue = next(f for f in body["flags"] if f["type"] == "mue_exceeded")
+    assert mue["overcharge_amount"] == round(25.0 * 2 / 3, 2)
+    assert body["total_flagged_amount"] == pytest.approx(112.0 + 40.0 + mue["overcharge_amount"])
+    # letter grounded in the new flags too
+    prompt = str(fake.calls[-1]["contents"])
+    assert "unbundling" in prompt and "mue_exceeded" in prompt
 
 
 # --- Live end-to-end (opt-in: spends 3 real Gemini calls) -------------------
