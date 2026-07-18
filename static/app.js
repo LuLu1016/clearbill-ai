@@ -149,6 +149,15 @@ function money(n) {
   return `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
+// The backend normalizes dates to YYYY-MM-DD so it can reliably match a bill
+// line to its EOB line -- that's the right format to compute with, but not
+// the right format to show a patient. Reformat for display only.
+function friendlyDate(iso) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso || "")) return iso || "";
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
 function renderResults(data) {
   const total = data.bill_items.reduce((s, i) => s + i.amount, 0);
 
@@ -186,7 +195,7 @@ function renderResults(data) {
           ${amount ? `<span class="flag-amount">${amount}</span>` : ""}
         </div>
         <p class="flag-explanation">${escapeHtml(f.explanation)}</p>
-        <div class="flag-meta">CPT ${escapeHtml(f.code)} &middot; ${escapeHtml(f.date)} &middot; ${escapeHtml(f.confidence)} confidence</div>
+        <div class="flag-meta">CPT ${escapeHtml(f.code)} &middot; ${escapeHtml(friendlyDate(f.date))} &middot; ${escapeHtml(f.confidence)} confidence</div>
       `;
       flagsWrap.appendChild(div);
     });

@@ -20,6 +20,7 @@ import io
 import json
 import os
 import re
+from datetime import datetime
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request, send_from_directory
@@ -223,17 +224,23 @@ def find_duplicate_charges(line_items: list[dict]) -> list[dict]:
     flags = []
     for (code, date), items in seen.items():
         if len(items) > 1:
+            # Patients don't recognize CPT codes -- lead the explanation with
+            # the plain-language description as printed on their own bill,
+            # and keep the code as supporting detail, not the headline.
+            description = next((i.get("description", "").strip() for i in items if i.get("description", "").strip()), "")
+            label = f'"{description}" (CPT {code})' if description else f"CPT {code}"
             flags.append(
                 {
                     "type": "duplicate_charge",
                     "confidence": "high",
                     "code": code,
                     "date": date,
+                    "description": description,
                     "occurrences": len(items),
                     "total_amount": sum(i["amount"] for i in items),
                     "overcharge_amount": sum(i["amount"] for i in items[1:]),
                     "explanation": (
-                        f"CPT {code} was billed {len(items)} times on {date}. "
+                        f"{label} was billed {len(items)} times on {_friendly_date(date)}. "
                         "Billing the same discrete service twice in one encounter "
                         "without a modifier documenting medical necessity of a repeat "
                         "is almost always a duplicate-entry error."
@@ -254,6 +261,17 @@ def _line_key(code: str, date: str) -> tuple[str, str]:
     return (str(code).strip().upper(), str(date).strip())
 
 
+def _friendly_date(iso: str) -> str:
+    """YYYY-MM-DD is the right format to match bill/EOB lines on -- it's not
+    the right format to put in a sentence a patient reads. Reformat only for
+    human-facing text; matching/joining always uses the raw ISO string."""
+    try:
+        d = datetime.strptime(iso, "%Y-%m-%d")
+        return f"{d.strftime('%b')} {d.day}, {d.year}"  # avoids non-portable %-d
+    except (ValueError, TypeError):
+        return iso
+
+
 def cross_check_eob(bill_items: list[dict], eob_items: list[dict]) -> list[dict]:
     """Join denied EOB lines against the bill: flag only when the insurer
     denied a charge AND that same charge (code + date) is still on the
@@ -272,15 +290,27 @@ def cross_check_eob(bill_items: list[dict], eob_items: list[dict]) -> list[dict]
         code, date = item["procedure_code"], item["service_date"]
         carc = item.get("carc_code", "").strip()
         reason = item.get("denial_reason", "").strip()
+        # The model is told to copy denial_reason "exactly as printed," and
+        # EOBs often print the CARC code inline with the reason text (e.g.
+        # "CARC 18 -- Exact duplicate claim/service"). Strip a leading repeat
+        # of the code we're about to cite separately, or the message reads
+        # "CARC 18: CARC 18 -- Exact duplicate claim/service".
+        if carc:
+            reason = re.sub(rf"^\s*(CARC\s*)?{re.escape(carc)}\s*[-:]+\s*", "", reason, flags=re.IGNORECASE)
         cited = f" (CARC {carc}: {reason})" if carc and reason else (
             f" (CARC {carc})" if carc else (f' ("{reason}")' if reason else "")
         )
+        description = next(
+            (b.get("description", "").strip() for b in billed[key] if b.get("description", "").strip()), ""
+        )
+        label = f'"{description}"' if description else f"CPT {code}"
         flags.append(
             {
                 "type": "denied_but_still_billed",
                 "confidence": "high",
                 "code": code,
                 "date": date,
+                "description": description,
                 "denial_status": item["denial_status"],
                 "denial_reason": reason,
                 "carc_code": carc,
@@ -291,7 +321,7 @@ def cross_check_eob(bill_items: list[dict], eob_items: list[dict]) -> list[dict]
                 "billed_amount": item["billed_amount"],
                 "overcharge_amount": item["billed_amount"],
                 "explanation": (
-                    f"Your insurer's EOB shows CPT {code} on {date} was denied{cited}, "
+                    f"Your insurer's EOB shows {label} on {_friendly_date(date)} was denied{cited}, "
                     "yet the provider's bill still lists this charge as patient-owed."
                 ),
             }
