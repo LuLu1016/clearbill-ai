@@ -5,7 +5,7 @@ const {
 
 const PAGE_WIDTH = 12240;
 const PAGE_HEIGHT = 15840;
-const MARGIN = 720; // 0.5"
+const MARGIN = 630; // ~0.44"
 
 function statBlock(items) {
   return new Table({
@@ -17,23 +17,23 @@ function statBlock(items) {
           (it) =>
             new TableCell({
               width: { size: (PAGE_WIDTH - 2 * MARGIN) / items.length, type: WidthType.DXA },
-              shading: { type: ShadingType.CLEAR, fill: "F2F2F2" },
-              margins: { top: 160, bottom: 160, left: 160, right: 160 },
+              shading: { type: ShadingType.CLEAR, fill: "F1F0E8" },
+              margins: { top: 140, bottom: 140, left: 140, right: 140 },
               borders: {
-                top: { style: BorderStyle.SINGLE, size: 2, color: "DDDDDD" },
-                bottom: { style: BorderStyle.SINGLE, size: 2, color: "DDDDDD" },
-                left: { style: BorderStyle.SINGLE, size: 2, color: "DDDDDD" },
-                right: { style: BorderStyle.SINGLE, size: 2, color: "DDDDDD" },
+                top: { style: BorderStyle.SINGLE, size: 2, color: "DDD9C8" },
+                bottom: { style: BorderStyle.SINGLE, size: 2, color: "DDD9C8" },
+                left: { style: BorderStyle.SINGLE, size: 2, color: "DDD9C8" },
+                right: { style: BorderStyle.SINGLE, size: 2, color: "DDD9C8" },
               },
               children: [
                 new Paragraph({
                   alignment: AlignmentType.CENTER,
-                  children: [new TextRun({ text: it.big, bold: true, size: 30, color: "1A56DB" })],
+                  children: [new TextRun({ text: it.big, bold: true, size: 28, color: "2E7D3B" })],
                 }),
                 new Paragraph({
                   alignment: AlignmentType.CENTER,
-                  spacing: { before: 40 },
-                  children: [new TextRun({ text: it.label, size: 16, color: "555555" })],
+                  spacing: { before: 30 },
+                  children: [new TextRun({ text: it.label, size: 15, color: "555248" })],
                 }),
               ],
             })
@@ -46,23 +46,23 @@ function statBlock(items) {
 function sectionHeading(text) {
   return new Paragraph({
     heading: HeadingLevel.HEADING_2,
-    spacing: { before: 220, after: 80 },
-    children: [new TextRun({ text, bold: true, color: "1A56DB", size: 24 })],
+    spacing: { before: 200, after: 70 },
+    children: [new TextRun({ text, bold: true, color: "2E7D3B", size: 22 })],
   });
 }
 
 function body(text, opts = {}) {
   return new Paragraph({
-    spacing: { after: 100 },
-    children: [new TextRun({ text, size: 20, ...opts })],
+    spacing: { after: 90 },
+    children: [new TextRun({ text, size: 19, ...opts })],
   });
 }
 
 function bullet(text) {
   return new Paragraph({
     numbering: { reference: "bullets", level: 0 },
-    spacing: { after: 40 },
-    children: [new TextRun({ text, size: 20 })],
+    spacing: { after: 35 },
+    children: [new TextRun({ text, size: 19 })],
   });
 }
 
@@ -75,23 +75,16 @@ function cptTable() {
     ["85025", "CBC w/Auto Differential", "$445.00", "$178.00"],
     ["36415", "Venipuncture", "$112.00", "$44.80"],
   ];
-  const widths = [1800, 5200, 2000, 2000];
-  const mkCell = (text, bold, fill) =>
-    new TableCell({
-      width: { size: widths[0], type: WidthType.DXA },
-      shading: fill ? { type: ShadingType.CLEAR, fill } : undefined,
-      margins: { top: 80, bottom: 80, left: 120, right: 120 },
-      children: [new Paragraph({ children: [new TextRun({ text, bold, size: 18 })] })],
-    });
+  const widths = [1700, 5100, 2050, 2050];
   const headerRow = new TableRow({
     tableHeader: true,
     children: header.map(
       (h, i) =>
         new TableCell({
           width: { size: widths[i], type: WidthType.DXA },
-          shading: { type: ShadingType.CLEAR, fill: "1A56DB" },
-          margins: { top: 80, bottom: 80, left: 120, right: 120 },
-          children: [new Paragraph({ children: [new TextRun({ text: h, bold: true, size: 18, color: "FFFFFF" })] })],
+          shading: { type: ShadingType.CLEAR, fill: "2E7D3B" },
+          margins: { top: 70, bottom: 70, left: 110, right: 110 },
+          children: [new Paragraph({ children: [new TextRun({ text: h, bold: true, size: 17, color: "FFFFFF" })] })],
         })
     ),
   });
@@ -102,9 +95,9 @@ function cptTable() {
           (c, i) =>
             new TableCell({
               width: { size: widths[i], type: WidthType.DXA },
-              shading: { type: ShadingType.CLEAR, fill: idx % 2 === 0 ? "FFFFFF" : "F7F9FC" },
-              margins: { top: 80, bottom: 80, left: 120, right: 120 },
-              children: [new Paragraph({ children: [new TextRun({ text: c, size: 18 })] })],
+              shading: { type: ShadingType.CLEAR, fill: idx % 2 === 0 ? "FFFFFF" : "F6F5EE" },
+              margins: { top: 70, bottom: 70, left: 110, right: 110 },
+              children: [new Paragraph({ children: [new TextRun({ text: c, size: 17 })] })],
             })
         ),
       })
@@ -135,58 +128,59 @@ const doc = new Document({
       },
       children: [
         new Paragraph({
-          children: [new TextRun({ text: "ClearBill AI", bold: true, size: 44, color: "0F172A" })],
+          children: [new TextRun({ text: "ClearBill AI", bold: true, size: 40, color: "16130E" })],
         }),
         new Paragraph({
-          spacing: { after: 160 },
+          spacing: { after: 130 },
           children: [
             new TextRun({
               text: "Find the money hospitals didn't mean to bill you.",
               italics: true,
-              size: 22,
-              color: "555555",
+              size: 20,
+              color: "555248",
             }),
           ],
         }),
 
         statBlock([
-          { big: "49–80%", label: "of medical bills contain errors" },
-          { big: "$88B", label: "lost annually to billing mistakes" },
-          { big: "$220B", label: "in medical debt held by 100M Americans" },
+          { big: "49–80%", label: "of medical bills contain an error" },
+          { big: "$1,300", label: "avg. overcharge on a $10K+ bill" },
+          { big: "$220B", label: "medical debt held by 100M Americans" },
         ]),
 
         sectionHeading("The Problem"),
         body(
-          "Nearly half to four-fifths of U.S. medical bills contain at least one error — duplicate charges, unbundled panels, or amounts that don't match the insurer's own Explanation of Benefits. On a $10,000+ hospital bill, that averages roughly $1,300 in overcharges. Physicians lose an estimated $125B/year and hospitals $68B/year to billing mistakes system-wide (CFPB, Medical Bill Rescue, 2025). Patients have no standardized way to dispute a bill — every hospital routes it through its own phone line, mail address, or fax, and reviewing a bill line-by-line against an EOB takes hours most people don't have. Most people just pay."
+          "Nearly half to four-fifths of U.S. medical bills contain an error — duplicate charges, unbundled panels, or amounts that don't match the insurer's own Explanation of Benefits. On a $10,000+ bill, that averages roughly $1,300 in overcharges. Physicians lose an estimated $125B/year and hospitals $68B/year to billing mistakes system-wide. Patients have no standardized way to dispute a bill — every hospital routes it through its own phone line, mail address, or fax — and reviewing a bill line-by-line against an EOB takes hours most people don't have. Most people just pay."
         ),
 
         sectionHeading("The Insight"),
         body(
-          "This isn't a hypothetical — it's the same problem the UF Warrington College of Business documented in complex multi-leg trades' cousin industry: opaque, asymmetric-information markets where the side with less time and expertise simply absorbs the loss. Medical billing is that market at consumer scale, and no one has built a self-serve, instant tool for the patient side."
+          "Billing errors aren't random — they're systematic, and the strongest signal that one occurred is already sitting in a document the patient already has: the insurer's own EOB. When an insurer marks a charge \"denied — duplicate,\" that's not our judgment, it's the payer's own adjudication. Nobody today cross-references the two documents by hand, because it requires reading two dense forms and matching line items by procedure code and date. That's a narrow, mechanical task — exactly what a deterministic pipeline does well, with Gemini doing the document understanding and plain code doing the parts that must never hallucinate."
         ),
 
         sectionHeading("The Solution"),
         body("Upload an itemized bill and its EOB. In under 60 seconds, ClearBill AI:"),
-        bullet("Extracts every line item and CPT/HCPCS code using Gemini multimodal document understanding"),
-        bullet("Flags exact duplicate charges — same code, same date, same encounter — a deterministic check with zero false positives"),
-        bullet(
-          "Cross-checks charges against CMS's own National Correct Coding Initiative (NCCI) Procedure-to-Procedure edits and Medically Unlikely Edits — the same public rule tables Medicare auditors use — flagging possible unbundling for review, never asserting fraud outright"
-        ),
-        bullet("Generates a ready-to-send dispute letter citing the specific code, date, and rule violated"),
-        bullet("Auto-faxes the letter directly to the hospital's billing department on the patient's command"),
+        bullet("Extracts every line item and CPT/HCPCS code from both documents using Gemini's multimodal document understanding"),
+        bullet("Flags exact duplicate charges — same code, same date, same encounter — a deterministic check with zero false-positive risk, not a model guess"),
+        bullet("Cross-references the bill against the EOB's own denial codes: if the insurer already said \"we're not paying this twice\" (citing the actual national Claim Adjustment Reason Code) and the provider billed it anyway, that's flagged"),
+        bullet("Generates a ready-to-send dispute letter citing the specific code, date, and reason — grounded only in what was actually found, nothing invented"),
+        bullet("Sends it — renders the letter to PDF and faxes it to the provider's billing office on the patient's command"),
 
-        sectionHeading("Proof It's Real, Not Hypothetical"),
+        sectionHeading("Built and Verified, Not Just Pitched"),
+        body(
+          "Every flag we raise is grounded in something citable — a plain code check or the payer's own denial code — never a model's unverified judgment call. We deliberately do NOT claim to detect coding \"unbundling\" violations: that check requires CMS's official NCCI Procedure-to-Procedure edit tables, which sit behind an AMA licensing gate we haven't cleared, so it's on our roadmap, not our pitch. We'd rather ship two checks that are always right than three where one might be wrong. The full pipeline — extraction, duplicate detection, the bill-vs-EOB join, letter generation — has been run live against real Gemini calls, has an automated test suite, and had two real bugs (a broken EOB cross-check, a wrong CPT-code message) caught and fixed before this submission, not after."
+        ),
+
+        sectionHeading("Proof It's Real"),
         body(
           "We validated our pricing logic against Stanford Health Care's own CMS-mandated price transparency file (100% public data, updated April 2026). A single ER visit at Stanford can carry the following gross charges:"
         ),
-        new Paragraph({ spacing: { before: 80, after: 160 }, children: [] }),
+        new Paragraph({ spacing: { before: 70, after: 130 }, children: [] }),
         cptTable(),
 
         sectionHeading("Why Now"),
         bullet("CFPB's 2025 rule barring medical debt from credit reports has sharpened scrutiny on billing accuracy"),
-        bullet(
-          "Gemini's multimodal document understanding + Live API make what used to require a $200/hr patient advocate instant and free to start"
-        ),
+        bullet("Gemini's multimodal document understanding + Live API make what used to require a $200/hr patient advocate instant and free to start"),
 
         sectionHeading("Market"),
         body(
@@ -204,7 +198,7 @@ const doc = new Document({
         ),
 
         sectionHeading("Team"),
-        body("[Team member names, roles, and one line of relevant background — fill in before submission]"),
+        body("[Team member full names, roles, and one line of relevant background — confirm before submission]"),
       ],
     },
   ],

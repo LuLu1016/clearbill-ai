@@ -8,7 +8,20 @@ charges, and a ready-to-send dispute letter.
 
 Built for the [Stanford x DeepMind Hackathon](https://luma.com/e51fygtm), July 19, 2026.
 
-**[Interactive preview](https://claude.ai/code/artifact/a71af5c3-3b75-4d1f-834b-c4929320e29d)** — click "Use sample bill" then "Analyze Bill" to see the full flow with no setup and no API key. It's a static walkthrough of a real Stanford Health Care scenario, not the live Gemini pipeline — that's `app.py`. The same file is checked in at `preview/index.html` if you'd rather open it locally.
+**[Interactive preview](https://claude.ai/code/artifact/a71af5c3-3b75-4d1f-834b-c4929320e29d)** — click "Use sample bill" then "Analyze Bill" to see the full flow with no setup and no API key. It's a static walkthrough of a real Stanford Health Care scenario, not the live Gemini pipeline — that's `app.py`. The same file is checked in at `preview/index.html` if you rather open it locally.
+
+### Status, for anyone skimming this before judging
+
+| Claim | Status |
+|---|---|
+| Duplicate-charge detection | ✅ Live-verified, deterministic, zero false-positive risk |
+| Bill-vs-EOB denial cross-check | ✅ Live-verified — was silently broken, fixed and re-verified (see `SUBMISSION.md`) |
+| Dispute letter generation | ✅ Live-verified, grounded only in the flags actually found |
+| Automated tests | ✅ `pytest tests/` — 8 passing, 0 failing |
+| NCCI "unbundling" detection | ❌ Not implemented (stub) — blocked on an AMA license gate, honestly labeled as roadmap everywhere it's mentioned |
+| Auto-fax | ⚙️ Built with a `dryrun` mode that works with no account; real provider (Documo/Notifyre) written from docs, not yet run against a live account |
+
+Full detail on what's real vs. roadmap: `SUBMISSION.md`.
 
 ## Why this is defensible, not a guess
 
@@ -83,14 +96,15 @@ RUN_LIVE_GEMINI=1 pytest tests/ -k live
 
 ## Deploy
 
-### Option A — Google AI Studio (vibe-coding path)
+Google AI Studio's "Build" mode generates a new app from a text prompt — it's
+not an import path for an existing multi-file Flask backend, and re-describing
+this app as a prompt would regenerate untested code from scratch, discarding
+the fixes and test coverage that exist right now. Deploy the real app to Cloud
+Run directly instead; ask the organizers whether a GitHub link satisfies the
+"Code Repository" rule's AI-Studio-sharing wording (it almost certainly does)
+rather than re-platforming to force a literal match.
 
-Per the hackathon rules, you can build/iterate directly in
-[Google AI Studio](https://aistudio.google.com/) and share via its sharing
-mechanics for the "Code Repository" submission requirement. Paste `app.py` and the
-`templates/`/`static/` files in as your starting point.
-
-### Option B — Google Cloud Run
+### Google Cloud Run
 
 ```bash
 gcloud auth login
