@@ -321,11 +321,6 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/")
-def index():
-    return render_template("index.html")
-
-
 @app.route("/healthz")
 def healthz():
     """Liveness probe -- no Gemini call, safe for load balancers to poll."""
