@@ -3,91 +3,90 @@
 <meta name="description" content="Find the money hospitals didn't mean to bill you." />
 <style>
   :root {
-    --bg: #f9f8f3;
+    --bg: #fcfbf9;
     --surface: #ffffff;
-    --surface-sunken: #f1efe4;
-    --border: #e3dfd0;
-    --border-strong: #d1cab3;
-    --text: #23281f;
-    --text-muted: #6c6a58;
-    --text-faint: #9b9784;
-    --accent: #2f6b4f;
-    --accent-hover: #24543e;
-    --accent-tint: #e3eee6;
-    --accent-ink: #f7fbf8;
-    --gold: #a97324;
-    --gold-tint: #f3e6cf;
-    --danger: #a83b2f;
-    --danger-tint: #f4ded9;
-    --shadow-sm: 0 1px 2px rgba(30, 28, 20, 0.05);
-    --shadow-md: 0 3px 12px rgba(30, 28, 20, 0.08), 0 1px 3px rgba(30, 28, 20, 0.05);
-    --shadow-lg: 0 18px 44px rgba(30, 28, 20, 0.14), 0 2px 8px rgba(30, 28, 20, 0.06);
-    --r-lg: 18px;
-    --r-md: 12px;
-    --r-sm: 8px;
-    --font-display: Georgia, "Iowan Old Style", "Palatino Linotype", "URW Palladio L", serif;
+    --surface-soft: #f3f1eb;
+    --border: #e7e3d9;
+    --border-strong: #d6d0c1;
+    --text: #211f1b;
+    --text-muted: #68655a;
+    --text-faint: #97927f;
+    --accent: #2e7d5b;
+    --accent-hover: #256a4c;
+    --accent-tint: #e6f1ea;
+    --accent-ink: #fbfdfc;
+    --gold: #b07a2c;
+    --gold-tint: #f4e9d4;
+    --danger: #ab4a37;
+    --danger-tint: #f5e2db;
+    --shadow-sm: 0 1px 2px rgba(33, 31, 27, 0.05);
+    --shadow-md: 0 4px 16px rgba(33, 31, 27, 0.08);
+    --shadow-lg: 0 20px 48px rgba(33, 31, 27, 0.14);
+    --r-lg: 22px;
+    --r-md: 14px;
+    --r-sm: 10px;
+    --font-display: "Avenir Next", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
     --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-    --font-mono: ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
   }
 
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #1a1d17;
-      --surface: #232620;
-      --surface-sunken: #1f221c;
-      --border: #383b30;
-      --border-strong: #494c3d;
-      --text: #eeecdf;
-      --text-muted: #a6a390;
-      --text-faint: #7c7a68;
-      --accent: #6fae86;
-      --accent-hover: #85c199;
-      --accent-tint: #24352a;
-      --accent-ink: #16211a;
-      --gold: #d3a659;
-      --gold-tint: #362a15;
-      --danger: #d68a7a;
-      --danger-tint: #3a241f;
+      --bg: #1a1918;
+      --surface: #242220;
+      --surface-soft: #201f1c;
+      --border: #38352e;
+      --border-strong: #48453b;
+      --text: #f0eee7;
+      --text-muted: #a8a494;
+      --text-faint: #7d7968;
+      --accent: #6bbd93;
+      --accent-hover: #7fcaa1;
+      --accent-tint: #223228;
+      --accent-ink: #12201a;
+      --gold: #d9ac66;
+      --gold-tint: #3a2d16;
+      --danger: #d98671;
+      --danger-tint: #3c2620;
       --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-      --shadow-md: 0 3px 12px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.2);
-      --shadow-lg: 0 18px 44px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+      --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.5);
     }
   }
   :root[data-theme="dark"] {
-    --bg: #1a1d17;
-    --surface: #232620;
-    --surface-sunken: #1f221c;
-    --border: #383b30;
-    --border-strong: #494c3d;
-    --text: #eeecdf;
-    --text-muted: #a6a390;
-    --text-faint: #7c7a68;
-    --accent: #6fae86;
-    --accent-hover: #85c199;
-    --accent-tint: #24352a;
-    --accent-ink: #16211a;
-    --gold: #d3a659;
-    --gold-tint: #362a15;
-    --danger: #d68a7a;
-    --danger-tint: #3a241f;
+    --bg: #1a1918;
+    --surface: #242220;
+    --surface-soft: #201f1c;
+    --border: #38352e;
+    --border-strong: #48453b;
+    --text: #f0eee7;
+    --text-muted: #a8a494;
+    --text-faint: #7d7968;
+    --accent: #6bbd93;
+    --accent-hover: #7fcaa1;
+    --accent-tint: #223228;
+    --accent-ink: #12201a;
+    --gold: #d9ac66;
+    --gold-tint: #3a2d16;
+    --danger: #d98671;
+    --danger-tint: #3c2620;
   }
   :root[data-theme="light"] {
-    --bg: #f9f8f3;
+    --bg: #fcfbf9;
     --surface: #ffffff;
-    --surface-sunken: #f1efe4;
-    --border: #e3dfd0;
-    --border-strong: #d1cab3;
-    --text: #23281f;
-    --text-muted: #6c6a58;
-    --text-faint: #9b9784;
-    --accent: #2f6b4f;
-    --accent-hover: #24543e;
-    --accent-tint: #e3eee6;
-    --accent-ink: #f7fbf8;
-    --gold: #a97324;
-    --gold-tint: #f3e6cf;
-    --danger: #a83b2f;
-    --danger-tint: #f4ded9;
+    --surface-soft: #f3f1eb;
+    --border: #e7e3d9;
+    --border-strong: #d6d0c1;
+    --text: #211f1b;
+    --text-muted: #68655a;
+    --text-faint: #97927f;
+    --accent: #2e7d5b;
+    --accent-hover: #256a4c;
+    --accent-tint: #e6f1ea;
+    --accent-ink: #fbfdfc;
+    --gold: #b07a2c;
+    --gold-tint: #f4e9d4;
+    --danger: #ab4a37;
+    --danger-tint: #f5e2db;
   }
 
   * { box-sizing: border-box; }
@@ -98,7 +97,7 @@
     color: var(--text);
     margin: 0;
     padding: 0 1.25rem 5rem;
-    line-height: 1.5;
+    line-height: 1.55;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -107,35 +106,33 @@
   /* ---------- Header ---------- */
 
   header {
-    max-width: 620px;
-    margin: 4rem auto 0;
+    max-width: 600px;
+    margin: 4.5rem auto 0;
     text-align: center;
-    position: relative;
   }
 
   .logo-mark {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 46px;
-    height: 46px;
+    width: 44px;
+    height: 44px;
     border-radius: 13px;
     background: var(--accent);
     color: var(--accent-ink);
+    font-family: var(--font-display);
     font-weight: 700;
-    font-size: 1.05rem;
-    margin-bottom: 1.2rem;
+    font-size: 1rem;
+    margin-bottom: 1.4rem;
     box-shadow: var(--shadow-md);
-    letter-spacing: -0.01em;
-    font-family: var(--font-mono);
   }
 
   header h1 {
     font-family: var(--font-display);
-    font-size: 2.5rem;
-    font-weight: 400;
-    letter-spacing: -0.01em;
-    margin: 0 0 0.55rem;
+    font-size: 2.3rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin: 0 0 0.6rem;
     text-wrap: balance;
   }
 
@@ -143,8 +140,7 @@
     color: var(--text-muted);
     font-size: 1.05rem;
     margin: 0;
-    font-family: var(--font-display);
-    font-style: italic;
+    font-weight: 400;
   }
 
   .preview-badge {
@@ -154,54 +150,75 @@
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    font-family: var(--font-ui);
     color: var(--gold);
     background: var(--gold-tint);
     padding: 0.3rem 0.7rem;
     border-radius: 999px;
   }
 
-  /* torn-receipt edge under the header */
-  .perforation {
-    max-width: 620px;
-    margin: 2rem auto 0;
-    height: 10px;
-    background-image: radial-gradient(circle at 10px 0, transparent 6px, var(--bg) 6.5px);
-    background-size: 20px 10px;
-    background-repeat: repeat-x;
-    background-position: center top;
+  /* ---------- Stat strip ---------- */
+
+  .stat-strip {
+    max-width: 600px;
+    margin: 2.25rem auto 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
   }
-  .perforation::before {
-    content: "";
-    display: block;
-    height: 1px;
-    background: var(--border-strong);
-    margin-top: -1px;
+  .stat-strip-item { text-align: center; padding: 0.5rem; }
+  .stat-strip-value {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
   }
+  .stat-strip-label { font-size: 0.76rem; color: var(--text-muted); margin-top: 0.2rem; line-height: 1.4; }
+  .stat-source { max-width: 600px; margin: 0.6rem auto 0; text-align: center; font-size: 0.7rem; color: var(--text-faint); }
+
+  /* ---------- How it works ---------- */
+
+  .how-it-works {
+    max-width: 600px;
+    margin: 2.5rem auto 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  @media (max-width: 560px) { .how-it-works { grid-template-columns: 1fr; } }
+  .how-step { display: flex; align-items: flex-start; gap: 0.65rem; }
+  .how-num {
+    flex: 0 0 auto; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--accent-tint); color: var(--accent);
+    font-family: var(--font-display); font-weight: 700; font-size: 0.8rem;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .how-title { font-weight: 600; font-size: 0.88rem; }
+  .how-desc { font-size: 0.79rem; color: var(--text-muted); line-height: 1.45; margin-top: 0.15rem; }
 
   /* ---------- Layout ---------- */
 
   main {
-    max-width: 620px;
+    max-width: 600px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    padding-top: 2rem;
+    gap: 1.1rem;
+    padding-top: 2.25rem;
   }
 
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--r-lg);
-    padding: 1.75rem;
+    padding: 1.9rem;
     box-shadow: var(--shadow-sm);
   }
 
   .card h2 {
     font-family: var(--font-display);
-    font-weight: 400;
-    font-size: 1.3rem;
+    font-weight: 600;
+    font-size: 1.25rem;
     margin: 0 0 1rem;
   }
 
@@ -211,44 +228,35 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.85rem;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.35rem;
   }
-  @media (max-width: 560px) {
-    .dropzone-group { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 560px) { .dropzone-group { grid-template-columns: 1fr; } }
 
   .dropzone {
     position: relative;
     border: 1.5px dashed var(--border-strong);
     border-radius: var(--r-md);
-    padding: 1.4rem 1rem;
+    padding: 1.5rem 1rem;
     text-align: center;
     cursor: pointer;
-    transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
-    background: var(--surface-sunken);
+    transition: border-color 0.2s ease, background 0.2s ease;
+    background: var(--surface-soft);
   }
   .dropzone:hover { border-color: var(--accent); background: var(--accent-tint); }
-  .dropzone.drag-over { border-color: var(--accent); background: var(--accent-tint); transform: scale(1.01); }
+  .dropzone.drag-over { border-color: var(--accent); background: var(--accent-tint); }
   .dropzone.has-file { border-style: solid; border-color: var(--accent); background: var(--accent-tint); }
   .dropzone:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
   .dropzone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 
-  .dropzone-icon { width: 30px; height: 30px; margin: 0 auto 0.55rem; color: var(--text-faint); }
+  .dropzone-icon { width: 28px; height: 28px; margin: 0 auto 0.6rem; color: var(--text-faint); }
   .dropzone.has-file .dropzone-icon { color: var(--accent); }
-  .dropzone-label { font-weight: 600; font-size: 0.88rem; }
-  .dropzone-hint { font-size: 0.76rem; color: var(--text-faint); margin-top: 0.15rem; }
-  .dropzone-filename-row {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    margin-top: 0.4rem;
-  }
+  .dropzone-label { font-weight: 600; font-size: 0.89rem; }
+  .dropzone-hint { font-size: 0.77rem; color: var(--text-faint); margin-top: 0.15rem; }
+  .dropzone-filename-row { display: none; align-items: center; justify-content: center; gap: 0.4rem; margin-top: 0.45rem; }
   .dropzone.has-file .dropzone-filename-row { display: flex; }
-  .dropzone-filename { font-size: 0.78rem; color: var(--accent); font-weight: 600; word-break: break-all; }
+  .dropzone-filename { font-size: 0.79rem; color: var(--accent); font-weight: 600; word-break: break-all; }
   .dropzone-clear {
-    position: relative;
-    z-index: 1;
+    position: relative; z-index: 1;
     background: none; border: none; padding: 0; width: 16px; height: 16px;
     border-radius: 50%; color: var(--text-faint); cursor: pointer;
     display: inline-flex; align-items: center; justify-content: center;
@@ -277,56 +285,52 @@
   .btn-primary:active { transform: scale(0.98); }
 
   .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border-strong); }
-  .btn-secondary:hover { background: var(--surface-sunken); border-color: var(--text-faint); }
+  .btn-secondary:hover { background: var(--surface-soft); border-color: var(--text-faint); }
 
-  .btn-ghost {
-    background: none; border: 1px dashed var(--border-strong); color: var(--text-muted);
-    flex: 0 0 auto;
-  }
+  .btn-ghost { background: none; border: 1px solid var(--border-strong); color: var(--text-muted); flex: 0 0 auto; }
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-tint); }
 
-  .hint { font-size: 0.8rem; color: var(--text-faint); margin: 0.9rem 0 0; text-align: center; line-height: 1.55; }
+  .hint { font-size: 0.81rem; color: var(--text-faint); margin: 0.95rem 0 0; text-align: center; line-height: 1.6; }
 
   .hidden { display: none !important; }
 
   /* ---------- Loading ---------- */
 
-  #loading { text-align: center; padding: 2.75rem 1rem; }
-  .spinner {
-    width: 26px; height: 26px; margin: 0 auto 1rem;
-    border: 3px solid var(--border); border-top-color: var(--accent);
-    border-radius: 50%; animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2s; } }
-  #loading p { color: var(--text-muted); font-size: 0.9rem; margin: 0; }
+  #loading { text-align: center; padding: 2.5rem 1rem; }
+  .pulse-dots { display: flex; justify-content: center; gap: 0.4rem; margin-bottom: 1.1rem; }
+  .pulse-dots span { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); animation: pulse 1.2s ease-in-out infinite; }
+  .pulse-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .pulse-dots span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes pulse { 0%, 80%, 100% { opacity: 0.25; transform: scale(0.85); } 40% { opacity: 1; transform: scale(1); } }
+  @media (prefers-reduced-motion: reduce) { .pulse-dots span { animation: none; opacity: 0.7; } }
+  #loading p { color: var(--text-muted); font-size: 0.92rem; margin: 0; }
 
   /* ---------- Results ---------- */
 
   .summary-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.5rem; }
-  .stat-box { background: var(--surface-sunken); border-radius: var(--r-sm); padding: 1rem 1.1rem; }
+  .stat-box { background: var(--surface-soft); border-radius: var(--r-sm); padding: 1rem 1.1rem; }
   .stat-box .stat-label { font-size: 0.72rem; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 0.3rem; }
-  .stat-box .stat-value { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
+  .stat-box .stat-value { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
   .stat-box.flagged .stat-value { color: var(--danger); }
   .summary-note { font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 0; }
 
   .flags-heading { font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-faint); margin: 0.25rem 0 0.6rem; padding: 0 0.1rem; }
 
-  .flag-card { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--danger); border-radius: var(--r-md); padding: 1.05rem 1.2rem; margin-bottom: 0.7rem; box-shadow: var(--shadow-sm); }
-  .flag-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.45rem; gap: 0.5rem; }
-  .flag-type { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; background: var(--danger-tint); color: var(--danger); font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 999px; }
-  .flag-amount { font-weight: 700; color: var(--danger); font-size: 0.94rem; white-space: nowrap; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-  .flag-explanation { font-size: 0.87rem; margin: 0 0 0.4rem; line-height: 1.55; }
-  .flag-meta { font-size: 0.76rem; color: var(--text-faint); font-family: var(--font-mono); }
-  .flag-source { font-size: 0.74rem; color: var(--text-faint); margin-top: 0.35rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }
+  .flag-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); padding: 1.15rem 1.3rem; margin-bottom: 0.7rem; box-shadow: var(--shadow-sm); }
+  .flag-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; gap: 0.5rem; }
+  .flag-type { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; background: var(--danger-tint); color: var(--danger); font-weight: 700; padding: 0.22rem 0.6rem; border-radius: 999px; }
+  .flag-amount { font-family: var(--font-display); font-weight: 700; color: var(--danger); font-size: 0.96rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .flag-explanation { font-size: 0.88rem; margin: 0 0 0.45rem; line-height: 1.6; }
+  .flag-meta { font-size: 0.77rem; color: var(--text-faint); }
+  .flag-source { font-size: 0.74rem; color: var(--text-faint); margin-top: 0.4rem; padding-top: 0.55rem; border-top: 1px solid var(--border); }
 
   /* ---------- Letter card ---------- */
 
-  #letter-card .letter-sub { font-size: 0.84rem; color: var(--text-muted); margin: -0.6rem 0 1rem; }
+  #letter-card .letter-sub { font-size: 0.85rem; color: var(--text-muted); margin: -0.6rem 0 1rem; }
   textarea {
     width: 100%; min-height: 230px; border: 1px solid var(--border); border-radius: var(--r-md);
-    padding: 1rem; font-family: var(--font-ui); font-size: 0.86rem; line-height: 1.6;
-    color: var(--text); background: var(--surface-sunken); resize: vertical;
+    padding: 1rem; font-family: var(--font-ui); font-size: 0.87rem; line-height: 1.65;
+    color: var(--text); background: var(--surface-soft); resize: vertical;
   }
   textarea:focus { outline: none; border-color: var(--accent); background: var(--surface); }
   .actions { display: flex; gap: 0.6rem; margin-top: 1rem; }
@@ -335,27 +339,20 @@
   /* ---------- Toast ---------- */
 
   #toast {
-    position: fixed;
-    left: 50%;
-    bottom: 1.75rem;
+    position: fixed; left: 50%; bottom: 1.75rem;
     transform: translateX(-50%) translateY(12px);
-    background: var(--text);
-    color: var(--bg);
-    padding: 0.7rem 1.1rem;
-    border-radius: 999px;
-    font-size: 0.85rem;
-    font-weight: 500;
+    background: var(--text); color: var(--bg);
+    padding: 0.7rem 1.15rem; border-radius: 999px;
+    font-size: 0.85rem; font-weight: 500;
     box-shadow: var(--shadow-lg);
-    opacity: 0;
-    pointer-events: none;
+    opacity: 0; pointer-events: none;
     transition: opacity 0.25s ease, transform 0.25s ease;
-    max-width: 90vw;
-    text-align: center;
+    max-width: 90vw; text-align: center;
   }
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  footer { max-width: 620px; margin: 3rem auto 0; text-align: center; font-size: 0.76rem; color: var(--text-faint); line-height: 1.6; }
-  footer code { background: var(--surface-sunken); padding: 0.1rem 0.35rem; border-radius: 5px; font-family: var(--font-mono); }
+  footer { max-width: 600px; margin: 3.5rem auto 0; text-align: center; font-size: 0.78rem; color: var(--text-faint); line-height: 1.6; }
+  footer code { background: var(--surface-soft); padding: 0.1rem 0.35rem; border-radius: 5px; font-size: 0.73rem; }
 </style>
 
 <header>
@@ -364,14 +361,55 @@
   <p class="tagline">Find the money hospitals didn't mean to bill you.</p>
   <div class="preview-badge">Interactive preview</div>
 </header>
-<div class="perforation" aria-hidden="true"></div>
+
+<section class="stat-strip" aria-label="Why this matters">
+  <div class="stat-strip-item">
+    <div class="stat-strip-value">49&ndash;80%</div>
+    <div class="stat-strip-label">of medical bills contain an error</div>
+  </div>
+  <div class="stat-strip-item">
+    <div class="stat-strip-value">$1,300</div>
+    <div class="stat-strip-label">avg. overcharge on a $10k+ bill</div>
+  </div>
+  <div class="stat-strip-item">
+    <div class="stat-strip-value">60 sec</div>
+    <div class="stat-strip-label">to check yours, free</div>
+  </div>
+</section>
+<p class="stat-source">Sources: Medical Bill Rescue, Aptarro Healthcare Billing Statistics 2026</p>
 
 <main>
+  <section class="how-it-works" aria-label="How it works">
+    <div class="how-step">
+      <span class="how-num">1</span>
+      <div>
+        <div class="how-title">Upload</div>
+        <div class="how-desc">Your itemized bill, and your EOB if you have one</div>
+      </div>
+    </div>
+    <div class="how-step">
+      <span class="how-num">2</span>
+      <div>
+        <div class="how-title">We check it</div>
+        <div class="how-desc">Duplicate charges, and anything your insurer already denied</div>
+      </div>
+    </div>
+    <div class="how-step">
+      <span class="how-num">3</span>
+      <div>
+        <div class="how-title">You dispute it</div>
+        <div class="how-desc">A ready-to-send letter citing the exact lines and codes</div>
+      </div>
+    </div>
+  </section>
+
   <section class="card">
     <div class="dropzone-group">
       <label class="dropzone" id="bill-drop" for="bill">
-        <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-          <path d="M9 12h6m-6 4h6M9 8h1M6 3h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke-linecap="round" stroke-linejoin="round" />
+        <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M7 3.5h7.5L19 8v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M14.5 3.5V8H19" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M9 13h6M9 16.5h4" stroke-linecap="round" />
         </svg>
         <div class="dropzone-label">Itemized Bill</div>
         <div class="dropzone-hint">PDF or photo &middot; required</div>
@@ -382,8 +420,10 @@
         <input type="file" id="bill" accept=".pdf,image/*" />
       </label>
       <label class="dropzone" id="eob-drop" for="eob">
-        <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-          <path d="M9 12h6m-6 4h6M9 8h1M6 3h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke-linecap="round" stroke-linejoin="round" />
+        <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M7 3.5h7.5L19 8v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M14.5 3.5V8H19" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M9 13h6M9 16.5h4" stroke-linecap="round" />
         </svg>
         <div class="dropzone-label">EOB</div>
         <div class="dropzone-hint">Optional &middot; improves accuracy</div>
@@ -405,7 +445,7 @@
   </section>
 
   <section id="loading" class="card hidden" aria-live="polite">
-    <div class="spinner"></div>
+    <div class="pulse-dots"><span></span><span></span><span></span></div>
     <p id="loading-text">Extracting line items&hellip;</p>
   </section>
 
@@ -432,8 +472,8 @@
         <span class="flag-type">Duplicate charge</span>
         <span class="flag-amount">$112.00</span>
       </div>
-      <p class="flag-explanation">CPT 36415 (Venipuncture) was billed twice on 07/10/2026. Billing the same discrete service twice in one encounter without a modifier documenting medical necessity of a repeat is almost always a duplicate-entry error.</p>
-      <div class="flag-meta">CPT 36415 &middot; 07/10/2026 &middot; high confidence</div>
+      <p class="flag-explanation">"Venipuncture, Routine Collection" (CPT 36415) was billed twice on Jul 10, 2026. Billing the same discrete service twice in one encounter without a modifier documenting medical necessity of a repeat is almost always a duplicate-entry error.</p>
+      <div class="flag-meta">CPT 36415 &middot; Jul 10, 2026 &middot; high confidence</div>
       <div class="flag-source">Detected with plain line-count logic &mdash; not a model guess, so there's no false-positive risk here.</div>
     </div>
 
@@ -442,8 +482,8 @@
         <span class="flag-type">Denied but still billed</span>
         <span class="flag-amount">$0.00 owed per EOB</span>
       </div>
-      <p class="flag-explanation">Your insurer's EOB marks the second CPT 36415 line with CARC 18 &mdash; "Exact duplicate claim/service" &mdash; meaning the plan already refused to pay it twice. Stanford's own statement still lists it as part of your balance.</p>
-      <div class="flag-meta">CPT 36415 &middot; 07/10/2026 &middot; high confidence</div>
+      <p class="flag-explanation">Your insurer's EOB shows "Venipuncture, Routine Collection" on Jul 10, 2026 was denied (CARC 18: Exact duplicate claim/service), yet the provider's bill still lists this charge as patient-owed.</p>
+      <div class="flag-meta">CPT 36415 &middot; Jul 10, 2026 &middot; high confidence</div>
       <div class="flag-source">Cross-referenced against the EOB's own remark code &mdash; CARC 18 is the standard national code payers use for this exact situation.</div>
     </div>
 
@@ -477,17 +517,17 @@
 Patient Billing Customer Service
 1-800-549-3720
 
-Re: Billing dispute \u2014 Account #SHC-DEMO-00219
-Date of Service: 07/10/2026
+Re: Billing dispute — Account #SHC-DEMO-00219
+Date of Service: Jul 10, 2026
 
 To Patient Billing Customer Service,
 
-I am writing to formally dispute a charge on my itemized statement dated 07/16/2026.
+I am writing to formally dispute a charge on my itemized statement dated Jul 16, 2026.
 
 CPT code 36415 (Venipuncture, Routine Collection) appears twice for the same date of
-service, 07/10/2026, at $112.00 each. My insurer's Explanation of Benefits (Claim
-#CLM-2026-0710-4471) confirms the second occurrence was adjusted under CARC 18 \u2014
-"Exact duplicate claim/service" \u2014 and no payment is owed on that line.
+service, Jul 10, 2026, at $112.00 each. My insurer's Explanation of Benefits (Claim
+#CLM-2026-0710-4471) confirms the second occurrence was adjusted under CARC 18 —
+"Exact duplicate claim/service" — and no payment is owed on that line.
 
 I am requesting a corrected itemized statement removing the duplicate $112.00 charge,
 and an updated balance reflecting that correction.
@@ -550,10 +590,10 @@ Jordan A. Sample`;
   });
 
   const LOADING_STEPS = [
-    "Extracting line items\u2026",
-    "Checking for duplicate charges\u2026",
-    "Cross-referencing your EOB\u2026",
-    "Drafting your dispute letter\u2026",
+    "Extracting line items…",
+    "Checking for duplicate charges…",
+    "Cross-referencing your EOB…",
+    "Drafting your dispute letter…",
   ];
 
   document.getElementById("submit-btn").addEventListener("click", () => {
@@ -586,7 +626,7 @@ Jordan A. Sample`;
   });
 
   document.getElementById("fax-btn").addEventListener("click", () => {
-    showToast("Fax sending isn't connected in this preview \u2014 see the README to wire one up");
+    showToast("Fax sending isn't connected in this preview — see the README to wire one up");
   });
 
   document.getElementById("reset-btn").addEventListener("click", () => {
