@@ -8,6 +8,8 @@ charges, and a ready-to-send dispute letter.
 
 Built for the [Stanford x DeepMind Hackathon](https://luma.com/e51fygtm), July 19, 2026.
 
+**[Interactive preview](https://claude.ai/code/artifact/a71af5c3-3b75-4d1f-834b-c4929320e29d)** — click "Use sample bill" then "Analyze Bill" to see the full flow with no setup and no API key. It's a static walkthrough of a real Stanford Health Care scenario, not the live Gemini pipeline — that's `app.py`. The same file is checked in at `preview/index.html` if you'd rather open it locally.
+
 ## Why this is defensible, not a guess
 
 Every flag ClearBill AI raises is grounded in something citable:
