@@ -28,7 +28,7 @@ this section's wording before submitting so it doesn't undersell a feature
 that's now actually live; if you don't, the current wording is still
 accurate for what judges will see.
 
-**Still needed from you:** real team names/roles in the last section (2 min).
+Team section filled in: Lu Lu (Wharton MBA, Penn M.S. Computer Science, PM intern at Adobe) and Yiyan (go-to-market & growth).
 
 ---
 
@@ -70,9 +70,7 @@ obvious alternative*, which the research treats as non-negotiable, not
 optional. This version adds that beat explicitly. Matches the 9-slide deck
 in `pitch_deck/ClearBill_AI_Pitch_Deck.pptx` (speaker notes = this script,
 slide-by-slide) — present the deck live if you get semi-final/final stage
-time, screen-share it for the recorded video otherwise. Swap `[Name]` /
-`[background]` for real people before recording, in both the script and the
-deck's slide 3 and slide 9.
+time, screen-share it for the recorded video otherwise.
 
 **[0:00–0:10] Hook (slide 1)**
 > "Between 49 and 80 percent of medical bills in America contain an error.
@@ -80,9 +78,11 @@ deck's slide 3 and slide 9.
 > bill against their insurance paperwork by hand."
 
 **[0:10–0:22] Team (slide 3)**
-> "I'm [Name], [background]. This is [Name], [background]. We built
-> ClearBill AI this weekend because we wanted something we'd actually trust
-> our own families to use the next time a bill like this showed up."
+> "I'm Lu Lu — Wharton MBA and a Master's in Computer Science from Penn,
+> and I've been a product management intern at Adobe. This is Yiyan, who's
+> leading our go-to-market strategy. We built ClearBill AI this weekend
+> because we wanted something we'd actually trust our own families to use
+> the next time a bill like this showed up."
 
 **[0:22–0:48] Insight + product (slides 4–5)**
 > "Here's what nobody else does: the proof a bill is wrong is already in

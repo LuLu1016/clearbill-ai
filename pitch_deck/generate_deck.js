@@ -135,8 +135,8 @@ const doc = pres();
   title(s, "Built by people who wanted to trust it themselves");
 
   const team = [
-    ["[Name]", "[Role — one line of relevant background]"],
-    ["[Name]", "[Role — one line of relevant background]"],
+    ["Lu Lu", "Wharton MBA · Penn M.S. Computer Science · PM intern, Adobe"],
+    ["Yiyan", "Go-to-market & growth"],
   ];
   team.forEach(([name, bio], i) => {
     const x = 0.6 + i * 6.0;
@@ -157,7 +157,7 @@ const doc = pres();
 
   pageNum(s, 3);
   s.addNotes(
-    "[0:10-0:22 TEAM] I'm [Name], [background]. This is [Name], [background]. We built ClearBill AI this weekend because we wanted something we'd actually trust our own families to use the next time a bill like this showed up."
+    "[0:10-0:22 TEAM] I'm Lu Lu — Wharton MBA and a Master's in Computer Science from Penn, and I've been a product management intern at Adobe. This is Yiyan, who's leading our go-to-market strategy. We built ClearBill AI this weekend because we wanted something we'd actually trust our own families to use the next time a bill like this showed up."
   );
 }
 
@@ -376,7 +376,7 @@ const doc = pres();
   );
 
   s.addText("Team", { x: 0.6, y: 5.2, w: 5, h: 0.4, fontFace: FONT_BODY, bold: true, fontSize: 14, color: "8FB6A3", margin: 0 });
-  s.addText("[Name] · [Name]", {
+  s.addText("Lu Lu · Yiyan", {
     x: 0.6, y: 5.6, w: 6, h: 0.5, fontFace: FONT_BODY, fontSize: 15, color: WHITE, margin: 0,
   });
 

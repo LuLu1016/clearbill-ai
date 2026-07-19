@@ -153,7 +153,7 @@ const doc = new Document({
         line("Go-to-Market", "A confirmed refund is inherently shareable — same content shape as viral tax-refund posts. Distribution is mapped: r/personalfinance, patient-advocacy communities, employer benefits partnerships (one deal reaches thousands of employees)."),
         line("Business Model", "Free scan → success fee on recovered savings → B2B2C through employer benefits platforms and TPAs."),
         line("The Ask", "Not raising today. We want 30 minutes with a fund that has real conviction in consumer healthcare fintech.", { after: 130 }),
-        line("Team", "[Names, roles, one line of relevant background — confirm before submission]"),
+        line("Team", "Lu Lu — Wharton MBA, Penn M.S. Computer Science, product management intern at Adobe. Yiyan — go-to-market & growth."),
       ],
     },
   ],
