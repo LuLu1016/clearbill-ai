@@ -6,6 +6,7 @@ const {
 const PAGE_WIDTH = 12240;
 const PAGE_HEIGHT = 15840;
 const MARGIN = 630; // ~0.44"
+const FONT = "Arial";
 
 function statBlock(items) {
   return new Table({
@@ -28,12 +29,12 @@ function statBlock(items) {
               children: [
                 new Paragraph({
                   alignment: AlignmentType.CENTER,
-                  children: [new TextRun({ text: it.big, bold: true, size: 28, color: "2E7D3B" })],
+                  children: [new TextRun({ text: it.big, bold: true, size: 28, color: "2E7D3B", font: FONT })],
                 }),
                 new Paragraph({
                   alignment: AlignmentType.CENTER,
                   spacing: { before: 30 },
-                  children: [new TextRun({ text: it.label, size: 15, color: "555248" })],
+                  children: [new TextRun({ text: it.label, size: 15, color: "555248", font: FONT })],
                 }),
               ],
             })
@@ -47,14 +48,14 @@ function sectionHeading(text) {
   return new Paragraph({
     heading: HeadingLevel.HEADING_2,
     spacing: { before: 200, after: 70 },
-    children: [new TextRun({ text, bold: true, color: "2E7D3B", size: 22 })],
+    children: [new TextRun({ text, bold: true, color: "2E7D3B", size: 22, font: FONT })],
   });
 }
 
 function body(text, opts = {}) {
   return new Paragraph({
     spacing: { after: 90 },
-    children: [new TextRun({ text, size: 19, ...opts })],
+    children: [new TextRun({ text, size: 19, font: FONT, ...opts })],
   });
 }
 
@@ -62,7 +63,7 @@ function bullet(text) {
   return new Paragraph({
     numbering: { reference: "bullets", level: 0 },
     spacing: { after: 35 },
-    children: [new TextRun({ text, size: 19 })],
+    children: [new TextRun({ text, size: 19, font: FONT })],
   });
 }
 
@@ -84,7 +85,7 @@ function cptTable() {
           width: { size: widths[i], type: WidthType.DXA },
           shading: { type: ShadingType.CLEAR, fill: "2E7D3B" },
           margins: { top: 70, bottom: 70, left: 110, right: 110 },
-          children: [new Paragraph({ children: [new TextRun({ text: h, bold: true, size: 17, color: "FFFFFF" })] })],
+          children: [new Paragraph({ children: [new TextRun({ text: h, bold: true, size: 17, color: "FFFFFF", font: FONT })] })],
         })
     ),
   });
@@ -97,7 +98,7 @@ function cptTable() {
               width: { size: widths[i], type: WidthType.DXA },
               shading: { type: ShadingType.CLEAR, fill: idx % 2 === 0 ? "FFFFFF" : "F6F5EE" },
               margins: { top: 70, bottom: 70, left: 110, right: 110 },
-              children: [new Paragraph({ children: [new TextRun({ text: c, size: 17 })] })],
+              children: [new Paragraph({ children: [new TextRun({ text: c, size: 17, font: FONT })] })],
             })
         ),
       })
@@ -110,6 +111,12 @@ function cptTable() {
 }
 
 const doc = new Document({
+  styles: {
+    default: {
+      document: { run: { font: FONT } },
+      heading2: { run: { font: FONT } },
+    },
+  },
   numbering: {
     config: [
       {
@@ -128,7 +135,7 @@ const doc = new Document({
       },
       children: [
         new Paragraph({
-          children: [new TextRun({ text: "ClearBill AI", bold: true, size: 40, color: "16130E" })],
+          children: [new TextRun({ text: "ClearBill AI", bold: true, size: 40, color: "16130E", font: FONT })],
         }),
         new Paragraph({
           spacing: { after: 130 },
@@ -138,6 +145,7 @@ const doc = new Document({
               italics: true,
               size: 20,
               color: "555248",
+              font: FONT,
             }),
           ],
         }),
@@ -150,57 +158,62 @@ const doc = new Document({
 
         sectionHeading("The Problem"),
         body(
-          "Nearly half to four-fifths of U.S. medical bills contain an error — duplicate charges, unbundled panels, or amounts that don't match the insurer's own Explanation of Benefits. On a $10,000+ bill, that averages roughly $1,300 in overcharges. Physicians lose an estimated $125B/year and hospitals $68B/year to billing mistakes system-wide. Patients have no standardized way to dispute a bill — every hospital routes it through its own phone line, mail address, or fax — and reviewing a bill line-by-line against an EOB takes hours most people don't have. Most people just pay."
+          "Between 49% and 80% of U.S. medical bills contain an error: duplicate charges, unbundled panels, or amounts that do not match the insurer's own Explanation of Benefits. On a $10,000+ bill, that averages roughly $1,300 in overcharges. Billing mistakes cost physicians an estimated $125B per year and hospitals $68B per year system-wide. Patients have no standardized way to dispute a bill. Every hospital routes disputes through its own phone line, mail address, or fax, and reconciling a bill against an EOB by hand takes hours most people do not have. Most people simply pay."
         ),
 
         sectionHeading("The Insight"),
         body(
-          "Billing errors aren't random — they're systematic, and the strongest signal that one occurred is already sitting in a document the patient already has: the insurer's own EOB. When an insurer marks a charge \"denied — duplicate,\" that's not our judgment, it's the payer's own adjudication. Nobody today cross-references the two documents by hand, because it requires reading two dense forms and matching line items by procedure code and date. That's a narrow, mechanical task — exactly what a deterministic pipeline does well, with Gemini doing the document understanding and plain code doing the parts that must never hallucinate."
+          "Billing errors are not random. The strongest signal that one occurred is already sitting in a document the patient already holds: the insurer's own EOB. When an insurer marks a charge \"denied, duplicate,\" that is not our judgment; it is the payer's own adjudication. No one today cross-references the two documents by hand, because doing so requires reading two dense forms and matching line items by procedure code and date. That is a narrow, mechanical task, and exactly what a deterministic pipeline is suited to: Gemini performs the document understanding, and plain code performs the parts that must never hallucinate."
         ),
 
         sectionHeading("The Solution"),
-        body("Upload an itemized bill and its EOB. In under 60 seconds, ClearBill AI:"),
-        bullet("Extracts every line item and CPT/HCPCS code from both documents using Gemini's multimodal document understanding"),
-        bullet("Flags exact duplicate charges — same code, same date, same encounter — a deterministic check with zero false-positive risk, not a model guess"),
-        bullet("Cross-references the bill against the EOB's own denial codes: if the insurer already said \"we're not paying this twice\" (citing the actual national Claim Adjustment Reason Code) and the provider billed it anyway, that's flagged"),
-        bullet("Generates a ready-to-send dispute letter citing the specific code, date, and reason — grounded only in what was actually found, nothing invented"),
-        bullet("Sends it — renders the letter to PDF and faxes it to the provider's billing office on the patient's command"),
+        body("Upload an itemized bill and its EOB. In under 60 seconds, ClearBill AI will:"),
+        bullet("Extract every line item and CPT/HCPCS code from both documents using Gemini's multimodal document understanding"),
+        bullet("Flag exact duplicate charges: same code, same date, same encounter. Deterministic, with zero false-positive risk, never a model guess"),
+        bullet("Cross-reference the bill against the EOB's own denial codes. If the insurer already declined to pay a charge and the provider billed the patient for it anyway, that is flagged and cited by its official Claim Adjustment Reason Code"),
+        bullet("Generate a dispute letter grounded only in what was actually found, citing the specific code, date, and reason"),
+        body("This is the first step. The product is designed around a longer loop."),
 
-        sectionHeading("Built and Verified, Not Just Pitched"),
+        sectionHeading("The Full Loop (Roadmap)"),
         body(
-          "Every flag we raise is grounded in something citable — a plain code check or the payer's own denial code — never a model's unverified judgment call. We deliberately do NOT claim to detect coding \"unbundling\" violations: that check requires CMS's official NCCI Procedure-to-Procedure edit tables, which sit behind an AMA licensing gate we haven't cleared, so it's on our roadmap, not our pitch. We'd rather ship two checks that are always right than three where one might be wrong. The full pipeline — extraction, duplicate detection, the bill-vs-EOB join, letter generation — has been run live against real Gemini calls, has an automated test suite, and had two real bugs (a broken EOB cross-check, a wrong CPT-code message) caught and fixed before this submission, not after."
+          "A letter that never gets sent recovers nothing. The roadmap extends ClearBill AI from a one-time audit into a managed dispute: the system sends the letter through the channel the provider actually uses (patient portal message, email, or fax), reads the provider's response when it arrives, drafts the next round of correspondence if the dispute continues, and escalates automatically if the provider does not respond within the customary window. The loop closes only when the refund is confirmed, whether through a corrected statement, a credit, or a returned payment. This is also the mechanism the success-fee model depends on: a fee tied to recovered savings requires tracking recovery, not just filing a dispute."
         ),
 
-        sectionHeading("Proof It's Real"),
+        sectionHeading("Built and Verified"),
         body(
-          "We validated our pricing logic against Stanford Health Care's own CMS-mandated price transparency file (100% public data, updated April 2026). A single ER visit at Stanford can carry the following gross charges:"
+          "Every flag we raise is grounded in something citable: a plain code check or the payer's own denial code, never an unverified judgment call from the model. We do not claim to detect coding \"unbundling\" violations. That check requires CMS's official NCCI Procedure-to-Procedure edit tables, which sit behind an AMA licensing gate we have not yet cleared, so it remains on the roadmap rather than the pitch. We would rather ship two checks that are always correct than three where one might not be. The full pipeline, extraction, duplicate detection, the bill-to-EOB join, and letter generation, has been run live against Gemini, is covered by an automated test suite, and had two real defects (a broken EOB cross-check and an incorrect CPT-code message) identified and fixed before this submission."
+        ),
+
+        sectionHeading("Grounded in Real Pricing Data"),
+        body(
+          "We validated our pricing logic against Stanford Health Care's own CMS-mandated price transparency file, current as of April 2026. A single ER visit at Stanford can carry the following gross charges:"
         ),
         new Paragraph({ spacing: { before: 70, after: 130 }, children: [] }),
         cptTable(),
 
         sectionHeading("Why Now"),
-        bullet("CFPB's 2025 rule barring medical debt from credit reports has sharpened scrutiny on billing accuracy"),
-        bullet("Gemini's multimodal document understanding + Live API make what used to require a $200/hr patient advocate instant and free to start"),
+        bullet("The CFPB's 2025 rule removing medical debt from credit reports has increased scrutiny on billing accuracy"),
+        bullet("Gemini's multimodal document understanding makes work that once required a $200/hour patient advocate available instantly and at no cost to start"),
 
-        sectionHeading("Market"),
+        sectionHeading("Market Size"),
         body(
-          "100M+ Americans currently hold medical debt; roughly 1.5B medical bills are issued in the U.S. annually. Existing white-glove medical-bill advocacy services (Resolve, GoodBill) charge 25–35% contingency fees — evidence of clear willingness to pay against a multi-billion-dollar pool of disputed medical debt."
+          "More than 100 million Americans currently hold medical debt, and roughly 1.5 billion medical bills are issued in the U.S. annually. Existing full-service medical-bill advocacy firms (Resolve, GoodBill) charge 25% to 35% contingency fees: evidence of a market that already pays for this outcome, manually and slowly."
         ),
 
         sectionHeading("Business Model"),
-        bullet("Freemium: free bill scan + evidence report"),
-        bullet("Success fee on verified, recovered savings once a dispute resolves"),
-        bullet("B2B2C: white-label for employer benefits packages, patient advocacy nonprofits, and TPAs"),
+        bullet("Freemium: free bill scan and evidence report"),
+        bullet("Success fee on recovered savings, paid only once a dispute resolves and the refund is confirmed"),
+        bullet("B2B2C distribution through employer benefits platforms, patient advocacy nonprofits, and third-party administrators"),
 
         sectionHeading("Go-to-Market & Traction"),
-        bullet("The core moment is inherently shareable: a 'we found $X you don't owe' result is the same content shape as tax-refund-reveal and settlement-check posts that already perform well on TikTok/Instagram — we designed a shareable result card for exactly this"),
-        bullet("The hook itself travels: '49-80% of medical bills contain an error' is alarming, true, and citation-backed — built to be the opening line of the demo video, not just a stat in a deck"),
-        bullet("Distribution is already mapped to existing communities with this exact pain point: r/personalfinance, r/HealthInsurance, patient-advocacy Facebook groups, and personal-finance creators who already cover medical debt"),
-        bullet("The B2B2C channel is a distribution channel, not just revenue: one employer benefits partnership reaches thousands of employees in a single push"),
+        bullet("The core result is inherently shareable. A confirmed refund follows the same content pattern as the tax-refund and settlement-check posts that already perform well on TikTok and Instagram; we built a shareable result card for exactly this moment"),
+        bullet("The opening stat travels on its own merit: between 49% and 80% of medical bills contain an error, a claim that is alarming, true, and fully citable"),
+        bullet("Distribution channels are already identified: r/personalfinance, r/HealthInsurance, patient-advocacy communities, and personal-finance creators who already cover medical debt"),
+        bullet("The B2B2C channel doubles as distribution. A single employer benefits partnership reaches thousands of employees at once"),
 
         sectionHeading("The Ask"),
         body(
-          "We're seeking pitch access to validate detection accuracy against real, anonymized billing datasets and explore integration partnerships with patient advocacy networks and self-insured employers."
+          "We are not raising today. We want thirty minutes with a fund that has genuine conviction in consumer healthcare fintech, to pressure-test two things: the data-access strategy for scaling detection beyond a single hospital's pricing file, and the recovery-verification model the success fee depends on."
         ),
 
         sectionHeading("Team"),
