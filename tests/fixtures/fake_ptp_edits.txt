@@ -1,0 +1,12 @@
+FAKE fixture -- mimics the real CMS PTP file layout, fake codes only
+Column1/Column2 Edits
+Column 1	Column 2	*=in existence	Effective	Deletion	Modifier	PTP Edit Rationale
+		prior to 1996	Date	Date	0=not allowed
+				*=no data	1=allowed
+					9=not applicable
+00000	00001		20260101	*	0	fake rationale - never allowed together (test only)
+00000	99999		20260101	*	1	fake rationale - modifier allowed (test only)
+99998	99999		20260101	20260401	9	fake rationale - deleted edit (test only)
+00001	99998		20260101	20260630	1	fake rationale - edit with deletion date (test only)
+00000	99998		20260101	*	1	fake rationale - re-added edit, current window (test only)
+00000	99998		20250101	20251231	0	fake rationale - old window (test only)

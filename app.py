@@ -32,6 +32,7 @@ from reportlab.lib.units import inch
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
 import fax_providers
+import ncci
 
 # Load .env from the project root so `python app.py` just works after
 # `cp .env.example .env`. Real environment variables (e.g. on Cloud Run,
@@ -40,6 +41,18 @@ load_dotenv()
 
 app = Flask(__name__)
 DEMO_ASSETS_DIR = os.path.join(os.path.dirname(__file__), "demo_assets")
+
+def _cms_path(env_var: str, default_name: str) -> str:
+    """CMS quarterly downloads keep their CMS-assigned filenames, which differ
+    per teammate/quarter -- so the paths come from .env, not hardcoding.
+    Relative paths resolve against the app dir so `pytest` and `gunicorn`
+    agree regardless of cwd."""
+    p = os.environ.get(env_var) or os.path.join("data", "raw", default_name)
+    return p if os.path.isabs(p) else os.path.join(os.path.dirname(__file__), p)
+
+
+PTP_EDITS_PATH = _cms_path("PTP_EDITS_PATH", "ptp_edits.txt")
+MUE_TABLE_PATH = _cms_path("MUE_TABLE_PATH", "mue_table.csv")
 
 if not os.environ.get("GEMINI_API_KEY"):
     app.logger.warning(
@@ -65,6 +78,28 @@ def get_client() -> genai.Client:
             )
         _client = genai.Client(api_key=api_key)
     return _client
+
+
+# The PTP file is ~475K rows; parsing it per request would dominate request
+# time. Same lazy-singleton pattern as get_client(): parse once per process
+# on first use. ({} from a missing file is also cached -- drop the CMS files
+# in data/raw/ and restart to pick them up.)
+_ptp_table = None
+_mue_table = None
+
+
+def get_ptp_table() -> dict:
+    global _ptp_table
+    if _ptp_table is None:
+        _ptp_table = ncci.load_ptp_edits(PTP_EDITS_PATH)
+    return _ptp_table
+
+
+def get_mue_table() -> dict:
+    global _mue_table
+    if _mue_table is None:
+        _mue_table = ncci.load_mue_table(MUE_TABLE_PATH)
+    return _mue_table
 
 # Shared normalization contract for both document types. Every field is
 # required-with-empty-value rather than optional: with optional fields the
@@ -103,8 +138,9 @@ EXTRACTION_SCHEMA = {
                     "modifier": {"type": "string"},
                     "description": {"type": "string"},
                     "amount": {"type": "number"},
+                    "units": {"type": "integer"},
                 },
-                "required": ["date", "code", "modifier", "description", "amount"],
+                "required": ["date", "code", "modifier", "description", "amount", "units"],
             },
         }
     },
@@ -161,7 +197,9 @@ def extract_line_items(file_bytes: bytes, mime_type: str) -> list[dict]:
             "This is a patient's itemized medical bill. Extract every "
             "individual service line item. For each line give: date (date of "
             "service), code (CPT/HCPCS), modifier, description (short, as "
-            "printed), and amount (the dollar amount charged for that line). "
+            "printed), amount (the dollar amount charged for that line), and "
+            "units (the quantity/units column for that line as an integer; "
+            "if the document prints no quantity for the line, use 1). "
             "Skip rows that are not service lines: subtotals, totals, balance "
             "forward, payments, adjustments, and remittance-stub rows.\n\n"
             + NORMALIZATION_RULES,
@@ -251,10 +289,145 @@ def find_duplicate_charges(line_items: list[dict]) -> list[dict]:
 
 
 def check_unbundling(line_items: list[dict]) -> list[dict]:
-    """Placeholder. Do NOT implement this with the model's own billing
-    knowledge -- verify code pairs against CMS's official NCCI PTP edit
-    file first (requires AMA CPT license acceptance). See README."""
-    return []
+    """Deterministic check: code pairs on the same date that CMS's NCCI PTP
+    edit file says must not be billed together. Never uses the model's own
+    billing knowledge -- only the official CMS file (via the process-level
+    cache in get_ptp_table()). With no CMS file present the table is {} and
+    this flags nothing.
+
+    An edit only applies if the bill's date of service falls inside the
+    edit's [effective, deletion] window; if the service date can't be
+    parsed, the pair is skipped -- an edit we can't confirm was in force is
+    not grounds to accuse anyone of unbundling.
+    """
+    ptp_table = get_ptp_table()
+
+    by_date = {}
+    for item in line_items:
+        by_date.setdefault(str(item["date"]).strip(), []).append(item)
+
+    flags = []
+    for date, items in by_date.items():
+        dos = date.replace("-", "")
+        if len(dos) != 8 or not dos.isdigit():
+            continue
+        by_code = {}
+        for item in items:
+            by_code.setdefault(str(item["code"]).strip(), []).append(item)
+        codes = sorted(by_code)
+        for i, a in enumerate(codes):
+            for b in codes[i + 1 :]:
+                # The CMS file is directional (Column 1 vs Column 2), so an
+                # unordered pair on the bill has to be checked both ways.
+                if (a, b) in ptp_table:
+                    col1, col2 = a, b
+                elif (b, a) in ptp_table:
+                    col1, col2 = b, a
+                else:
+                    continue
+                # A pair can carry several records with disjoint date windows
+                # (edit deleted then re-added); apply the one -- if any --
+                # that was in force on the bill's date of service.
+                edit = next(
+                    (
+                        e
+                        for e in ptp_table[(col1, col2)]
+                        if e["effective_date"] <= dos
+                        and (not e["deletion_date"] or dos <= e["deletion_date"])
+                    ),
+                    None,
+                )
+                if edit is None:
+                    continue
+                indicator = edit["modifier_indicator"]
+                if indicator == "9":  # edit not applicable -- never flag
+                    continue
+                pair_items = by_code[col1] + by_code[col2]
+                if indicator == "1" and any(str(i.get("modifier", "")).strip() for i in pair_items):
+                    continue  # a modifier is the legitimate override case
+                col2_item = by_code[col2][0]
+                description = col2_item.get("description", "").strip()
+                label = f'"{description}" (CPT {col2})' if description else f"CPT {col2}"
+                flags.append(
+                    {
+                        "type": "unbundling",
+                        "confidence": "high",
+                        "code": col2,
+                        "date": date,
+                        "description": description,
+                        "overcharge_amount": col2_item["amount"],
+                        "explanation": (
+                            f"{label} was billed alongside CPT {col1} on "
+                            f"{_friendly_date(date)}. Per the CMS NCCI PTP edit for this "
+                            f"pair (CMS rationale: {edit['rationale']}), CPT {col2} is "
+                            f"included in CPT {col1} and should not be billed separately"
+                            + (
+                                " unless a modifier documents a distinct service, and no "
+                                "modifier appears on either line."
+                                if indicator == "1"
+                                else "."
+                            )
+                        ),
+                    }
+                )
+    return flags
+
+
+def check_mue(line_items: list[dict]) -> list[dict]:
+    """Deterministic check: units billed for one code on one day exceeding
+    CMS's MUE (Medically Unlikely Edits) max-units-per-day for that code.
+
+    Reads the process-level cache (get_mue_table()); an absent data/raw/
+    file means an empty table and no flags. Lines missing a `units` value
+    (e.g. older recorded extractions) count as 1 unit.
+    """
+    mue_table = get_mue_table()
+
+    seen = {}
+    for item in line_items:
+        key = (str(item["code"]).strip(), str(item["date"]).strip())
+        seen.setdefault(key, []).append(item)
+
+    flags = []
+    for (code, date), items in seen.items():
+        max_units = mue_table.get(code)
+        if max_units is None:
+            continue
+        total_units = sum(int(i.get("units") or 1) for i in items)
+        if total_units <= max_units:
+            continue
+        # Overcharge = the amount attributable to units past the MUE limit,
+        # walking the lines in bill order; a line straddling the limit
+        # contributes pro-rata (its per-unit price times its excess units).
+        overcharge = 0.0
+        units_so_far = 0
+        for item in items:
+            u = int(item.get("units") or 1)
+            excess_in_line = min(units_so_far + u, total_units) - max(units_so_far, max_units)
+            if excess_in_line > 0:
+                overcharge += item["amount"] * excess_in_line / u
+            units_so_far += u
+        description = next((i.get("description", "").strip() for i in items if i.get("description", "").strip()), "")
+        label = f'"{description}" (CPT {code})' if description else f"CPT {code}"
+        flags.append(
+            {
+                "type": "mue_exceeded",
+                "confidence": "high",
+                "code": code,
+                "date": date,
+                "description": description,
+                "units_billed": total_units,
+                "max_units_per_day": max_units,
+                "overcharge_amount": round(overcharge, 2),
+                "explanation": (
+                    f"{label} was billed for {total_units} units on "
+                    f"{_friendly_date(date)}, but the CMS MUE limit for this code is "
+                    f"{max_units} per day. Units beyond that limit are considered "
+                    "medically unlikely and are routinely denied."
+                ),
+            }
+        )
+    return flags
 
 
 def _line_key(code: str, date: str) -> tuple[str, str]:
@@ -389,6 +562,7 @@ def analyze():
 
         flags = find_duplicate_charges(bill_items)
         flags += check_unbundling(bill_items)
+        flags += check_mue(bill_items)
         if eob_items:
             flags += cross_check_eob(bill_items, eob_items)
 
