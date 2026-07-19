@@ -192,6 +192,12 @@ const doc = new Document({
         bullet("Success fee on verified, recovered savings once a dispute resolves"),
         bullet("B2B2C: white-label for employer benefits packages, patient advocacy nonprofits, and TPAs"),
 
+        sectionHeading("Go-to-Market & Traction"),
+        bullet("The core moment is inherently shareable: a 'we found $X you don't owe' result is the same content shape as tax-refund-reveal and settlement-check posts that already perform well on TikTok/Instagram — we designed a shareable result card for exactly this"),
+        bullet("The hook itself travels: '49-80% of medical bills contain an error' is alarming, true, and citation-backed — built to be the opening line of the demo video, not just a stat in a deck"),
+        bullet("Distribution is already mapped to existing communities with this exact pain point: r/personalfinance, r/HealthInsurance, patient-advocacy Facebook groups, and personal-finance creators who already cover medical debt"),
+        bullet("The B2B2C channel is a distribution channel, not just revenue: one employer benefits partnership reaches thousands of employees in a single push"),
+
         sectionHeading("The Ask"),
         body(
           "We're seeking pitch access to validate detection accuracy against real, anonymized billing datasets and explore integration partnerships with patient advocacy networks and self-insured employers."

@@ -16,7 +16,17 @@ detection and the bill-vs-EOB cross-check, plus a "Built and Verified"
 section that states outright that we ran the live pipeline, wrote tests, and
 fixed two real bugs before submitting — that's a credibility signal most
 hackathon one-pagers don't have, so it's worth judges reading it, not cutting
-it for space.
+it for space. Also added a "Go-to-Market & Traction" section, since that's
+one of the five official judging criteria and the one-pager previously never
+addressed it at all.
+
+Note on the NCCI status specifically: your teammate has since built the real
+`check_unbundling()`/`ncci.py` implementation against the licensed CMS PTP/MUE
+files — it's real code now, gated behind licensed reference data that isn't
+committed to the repo. If you have those files loaded for the demo, update
+this section's wording before submitting so it doesn't undersell a feature
+that's now actually live; if you don't, the current wording is still
+accurate for what judges will see.
 
 **Still needed from you:** real team names/roles in the last section (2 min).
 
@@ -52,44 +62,60 @@ ready to deploy as-is. Do this in order:
 
 ## 3. Two-Minute Video — Team Intro & Elevator Pitch
 
-Timed script, ~290 words at a natural pace. Swap `[Name]` / `[background]`
-for real people before recording — don't perform this with placeholders in.
+Timed script, ~300 words at a natural pace, written so every one of the five
+judging criteria (technical feasibility, innovation, real-world
+applicability, market/fundability, GTM traction) surfaces somewhere in two
+minutes without ever sounding like a checklist. This exact script is also in
+the speaker notes of `pitch_deck/ClearBill_AI_Pitch_Deck.pptx` — one slide
+per beat, present the deck live if you get semi-final/final stage time,
+screen-share it for the recorded video otherwise. Swap `[Name]` /
+`[background]` for real people before recording.
 
-**[0:00–0:15] Hook — one person, straight to camera**
-> "Between 49 and 80 percent of medical bills in America have an error in
-> them. On a $10,000 bill, that's an average $1,300 overcharge. Almost
-> nobody catches it — not because the errors are subtle, but because nobody
-> has an hour to cross-reference their bill against their insurance
-> paperwork line by line. We built the thing that does."
+**[0:00–0:12] Hook (slide 1 → 2)**
+> "Between 49 and 80 percent of medical bills in America contain an error.
+> On a $10,000 bill, that's an average $1,300 overcharge — and almost
+> nobody catches it, because nobody has an hour to cross-reference their
+> bill against their insurance paperwork by hand."
 
-**[0:15–0:40] Team — second person**
-> "I'm [Name], [one line: background relevant to healthcare, data, or
-> building things fast]. This is [Name], [same]. We're [Wharton MBA /
-> Stanford / relevant program], and we spent this hackathon building
-> something we'd actually want our own families to use the next time a
-> hospital bill shows up."
+**[0:12–0:26] Team (slide 2)**
+> "I'm [Name], [background]. This is [Name], [background]. We built
+> ClearBill AI this weekend because we wanted something we'd actually trust
+> our own families to use the next time a bill like this showed up."
 
-**[0:40–1:20] What we built — trade off lines or one person**
-> "ClearBill AI reads your itemized bill and your insurance EOB side by
-> side. It catches exact duplicate charges — deterministically, not a model
-> guess, so there's zero false-positive risk. And it catches something more
-> interesting: when your insurer has *already* denied a charge as a
-> duplicate, using their own official denial code, but the hospital billed
-> you for it anyway. We didn't just prompt this and hope — we ran it live
+**[0:26–0:55] Insight + product — the novelty and how it works (slides 3–4)**
+> "Here's the insight: the strongest evidence a bill is wrong is already
+> sitting in a document the patient already has — their insurance company's
+> own Explanation of Benefits. When an insurer marks a charge 'denied,
+> duplicate,' that's not our opinion, that's the payer's own ruling. Upload
+> your bill and your EOB, and in under a minute Gemini reads both, catches
+> exact duplicate charges with zero-false-positive plain logic,
+> cross-references what your insurer already denied against what you're
+> still being billed for, and drafts a dispute letter citing the exact code
+> and reason."
+
+**[0:55–1:15] Technical feasibility / proof (slide 5)**
+> "We didn't just prompt this and hope. We ran the full pipeline live
 > against Gemini, wrote an automated test suite, and caught two real bugs
-> before this pitch, including a cross-check that was silently never firing.
-> We fixed both. That's the standard we held ourselves to."
+> before this pitch — including a cross-check that was silently never
+> firing — and fixed both. Every price on our demo bill is real, pulled
+> straight from Stanford Health Care's own federally mandated pricing
+> data."
 
-**[1:20–1:50] Why it matters / market**
-> "This isn't a niche problem. A hundred million Americans carry medical
-> debt. One and a half billion medical bills go out every year in the U.S.
-> Services that do this by hand already charge 25 to 35 percent contingency
-> fees — people are already paying for this, just slowly and manually. We
-> made it instant."
+**[1:15–1:35] Market & fundability (slide 6)**
+> "A hundred million Americans carry medical debt. One and a half billion
+> medical bills go out every year. Services that do this by hand already
+> charge 25 to 35 percent contingency fees — people are already paying for
+> this, just slowly. We made it instant."
 
-**[1:50–2:00] Close**
-> "We're ClearBill AI, and we'd love the chance to show you what it caught
-> on a real bill in the next two minutes."
+**[1:35–1:50] Go-to-market traction (slide 7)**
+> "And it's built to spread on its own: 'we found $X you don't owe' is the
+> same content shape as every viral tax-refund and settlement-check post —
+> we built a shareable result card for exactly that moment, distributed
+> straight into the communities already talking about this problem."
+
+**[1:50–2:00] Close (slide 8)**
+> "We're ClearBill AI. Give us two minutes with your bill, and we'll show
+> you what it caught."
 
 ---
 
