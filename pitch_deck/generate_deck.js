@@ -16,6 +16,8 @@ const WHITE = "FFFFFF";
 const FONT_HEAD = "Cambria";
 const FONT_BODY = "Calibri";
 
+const TOTAL_SLIDES = 9;
+
 function pres() {
   const p = new pptxgen();
   p.layout = "LAYOUT_WIDE"; // 13.3 x 7.5
@@ -51,7 +53,7 @@ function title(s, text, opts = {}) {
 }
 
 function pageNum(s, n, color = MUTED) {
-  s.addText(`${n} / 8`, {
+  s.addText(`${n} / ${TOTAL_SLIDES}`, {
     x: 12.4, y: 7.05, w: 0.7, h: 0.3,
     fontFace: FONT_BODY, fontSize: 10, color, align: "right",
   });
@@ -87,19 +89,23 @@ const doc = pres();
     fontFace: FONT_HEAD, fontSize: 20, bold: true, color: WHITE, align: "center", valign: "middle", margin: 0,
   });
   s.addText("ClearBill AI", {
-    x: 0.6, y: 2.6, w: 11.5, h: 1.3,
-    fontFace: FONT_HEAD, fontSize: 60, bold: true, color: WHITE, margin: 0,
+    x: 0.6, y: 2.35, w: 11.5, h: 1.2,
+    fontFace: FONT_HEAD, fontSize: 56, bold: true, color: WHITE, margin: 0,
   });
   s.addText("Find the money hospitals didn't mean to bill you.", {
-    x: 0.6, y: 3.85, w: 11, h: 0.6,
-    fontFace: FONT_BODY, fontSize: 20, italic: true, color: "CFE3D8", margin: 0,
+    x: 0.6, y: 3.55, w: 11, h: 0.55,
+    fontFace: FONT_BODY, fontSize: 19, italic: true, color: "CFE3D8", margin: 0,
+  });
+  s.addText("49–80% of medical bills contain an error. Nobody catches it — because nobody has an hour to cross-reference their bill against their insurance paperwork by hand.", {
+    x: 0.6, y: 4.35, w: 9.8, h: 1.1,
+    fontFace: FONT_BODY, fontSize: 15, color: "8FB6A3", margin: 0, lineSpacingMultiple: 1.3,
   });
   s.addText("Stanford × DeepMind Hackathon  ·  Built on Gemini + Google Cloud Run", {
     x: 0.6, y: 6.55, w: 11, h: 0.4,
     fontFace: FONT_BODY, fontSize: 13, color: "8FB6A3",
   });
   s.addNotes(
-    "[HOOK — 0:00-0:12] Between 49 and 80 percent of medical bills in America contain an error. On a $10,000 bill, that's an average $1,300 overcharge — and almost nobody catches it, because nobody has an hour to cross-reference their bill against their insurance paperwork by hand."
+    "[0:00-0:10 HOOK] Between 49 and 80 percent of medical bills in America contain an error. Nobody catches it, because nobody has an hour to cross-reference their bill against their insurance paperwork by hand."
   );
 }
 
@@ -113,22 +119,49 @@ const doc = pres();
   statCard(s, 8.6, 2.2, 3.7, 2.2, "$220B", "medical debt held by 100M Americans", GOLD);
   s.addText(
     "Physicians lose an estimated $125B/yr and hospitals $68B/yr to billing mistakes system-wide. There's no standardized way to dispute a bill — every hospital routes it through its own phone line, mail address, or fax.",
-    {
-      x: 0.6, y: 4.9, w: 11.7, h: 1.2,
-      fontFace: FONT_BODY, fontSize: 15, color: MUTED, margin: 0,
-    }
+    { x: 0.6, y: 4.9, w: 11.7, h: 1.2, fontFace: FONT_BODY, fontSize: 15, color: MUTED, margin: 0 }
   );
   s.addText("Sources: Medical Bill Rescue, Aptarro Healthcare Billing Statistics 2026", {
-    x: 0.6, y: 6.85, w: 8, h: 0.3,
-    fontFace: FONT_BODY, fontSize: 10, color: MUTED,
+    x: 0.6, y: 6.85, w: 8, h: 0.3, fontFace: FONT_BODY, fontSize: 10, color: MUTED,
   });
   pageNum(s, 2);
+  s.addNotes("(Visual support for the hook — no new spoken content here; keep talking through the hook while this is on screen.)");
+}
+
+// ---------- Slide 3: Team ----------
+{
+  const s = lightSlide(doc);
+  kicker(s, "The Team");
+  title(s, "Built by people who wanted to trust it themselves");
+
+  const team = [
+    ["[Name]", "[Role — one line of relevant background]"],
+    ["[Name]", "[Role — one line of relevant background]"],
+  ];
+  team.forEach(([name, bio], i) => {
+    const x = 0.6 + i * 6.0;
+    s.addShape("ellipse", { x, y: 2.3, w: 1.1, h: 1.1, fill: { color: GREEN_TINT }, line: { type: "none" } });
+    s.addText(
+      name.replace(/\[|\]/g, "").split(" ").map((w) => w[0]).join("").slice(0, 2) || "??",
+      { x, y: 2.3, w: 1.1, h: 1.1, align: "center", valign: "middle", fontFace: FONT_HEAD, bold: true, fontSize: 24, color: GREEN, margin: 0 }
+    );
+    s.addText(name, { x: x + 1.3, y: 2.45, w: 4.4, h: 0.45, fontFace: FONT_HEAD, bold: true, fontSize: 19, color: INK, margin: 0 });
+    s.addText(bio, { x: x + 1.3, y: 2.9, w: 4.4, h: 0.9, fontFace: FONT_BODY, fontSize: 13, color: MUTED, margin: 0, lineSpacingMultiple: 1.3 });
+  });
+
+  s.addShape("roundRect", { x: 0.6, y: 4.5, w: 11.7, h: 1.8, rectRadius: 0.14, fill: { color: WHITE }, line: { color: "E7E3D9", width: 1 } });
+  s.addText(
+    "We built ClearBill AI this weekend because we wanted something we'd actually trust our own families to use the next time a hospital bill like this showed up.",
+    { x: 1.0, y: 4.5, w: 10.9, h: 1.8, valign: "middle", fontFace: FONT_BODY, italic: true, fontSize: 16, color: INK, margin: 0, lineSpacingMultiple: 1.3 }
+  );
+
+  pageNum(s, 3);
   s.addNotes(
-    "[TEAM — 0:12-0:26] I'm [Name], [background]. This is [Name], [background]. We built ClearBill AI this weekend because we wanted something we'd actually trust our own families to use the next time a bill like this showed up."
+    "[0:10-0:22 TEAM] I'm [Name], [background]. This is [Name], [background]. We built ClearBill AI this weekend because we wanted something we'd actually trust our own families to use the next time a bill like this showed up."
   );
 }
 
-// ---------- Slide 3: The Insight ----------
+// ---------- Slide 4: The Insight ----------
 {
   const s = lightSlide(doc);
   kicker(s, "The Insight");
@@ -136,50 +169,34 @@ const doc = pres();
 
   s.addText(
     "When an insurer marks a charge “denied — duplicate,” that's not our judgment.\nIt's the payer's own ruling.",
-    {
-      x: 0.6, y: 2.1, w: 6.6, h: 1.5,
-      fontFace: FONT_BODY, fontSize: 19, color: INK, margin: 0, lineSpacingMultiple: 1.25,
-    }
+    { x: 0.6, y: 2.1, w: 6.6, h: 1.5, fontFace: FONT_BODY, fontSize: 19, color: INK, margin: 0, lineSpacingMultiple: 1.25 }
   );
   s.addText(
     "Nobody today cross-references the bill against the EOB by hand — it means reading two dense forms and matching line items by code and date. That's a narrow, mechanical task: exactly what a deterministic pipeline does well, with Gemini doing the document understanding and plain code doing the parts that must never hallucinate.",
-    {
-      x: 0.6, y: 3.75, w: 6.6, h: 2.3,
-      fontFace: FONT_BODY, fontSize: 14.5, color: MUTED, margin: 0, lineSpacingMultiple: 1.3,
-    }
+    { x: 0.6, y: 3.75, w: 6.6, h: 2.3, fontFace: FONT_BODY, fontSize: 14.5, color: MUTED, margin: 0, lineSpacingMultiple: 1.3 }
   );
 
-  // mini mock of the two documents converging
-  s.addShape("roundRect", {
-    x: 7.75, y: 2.15, w: 2.3, h: 1.5, rectRadius: 0.1,
-    fill: { color: WHITE }, line: { color: "E7E3D9", width: 1 },
-  });
+  s.addShape("roundRect", { x: 7.75, y: 2.15, w: 2.3, h: 1.5, rectRadius: 0.1, fill: { color: WHITE }, line: { color: "E7E3D9", width: 1 } });
   s.addText("Itemized Bill", { x: 7.75, y: 2.35, w: 2.3, h: 0.4, align: "center", fontFace: FONT_BODY, bold: true, fontSize: 12, color: INK, margin: 0 });
   s.addText("CPT 36415\nbilled twice", { x: 7.75, y: 2.85, w: 2.3, h: 0.7, align: "center", fontFace: FONT_BODY, fontSize: 11, color: MUTED, margin: 0 });
 
-  s.addShape("roundRect", {
-    x: 10.3, y: 2.15, w: 2.3, h: 1.5, rectRadius: 0.1,
-    fill: { color: WHITE }, line: { color: "E7E3D9", width: 1 },
-  });
+  s.addShape("roundRect", { x: 10.3, y: 2.15, w: 2.3, h: 1.5, rectRadius: 0.1, fill: { color: WHITE }, line: { color: "E7E3D9", width: 1 } });
   s.addText("Insurance EOB", { x: 10.3, y: 2.35, w: 2.3, h: 0.4, align: "center", fontFace: FONT_BODY, bold: true, fontSize: 12, color: INK, margin: 0 });
   s.addText("CARC 18:\ndenied duplicate", { x: 10.3, y: 2.85, w: 2.3, h: 0.7, align: "center", fontFace: FONT_BODY, fontSize: 11, color: MUTED, margin: 0 });
 
-  s.addShape("roundRect", {
-    x: 8.85, y: 4.0, w: 2.75, h: 0.85, rectRadius: 0.42,
-    fill: { color: DANGER_TINT }, line: { type: "none" },
-  });
+  s.addShape("roundRect", { x: 8.85, y: 4.0, w: 2.75, h: 0.85, rectRadius: 0.42, fill: { color: DANGER_TINT }, line: { type: "none" } });
   s.addText("$112 flagged", {
     x: 8.85, y: 4.0, w: 2.75, h: 0.85, align: "center", valign: "middle",
     fontFace: FONT_HEAD, bold: true, fontSize: 16, color: DANGER, margin: 0,
   });
 
-  pageNum(s, 3);
+  pageNum(s, 4);
   s.addNotes(
-    "[INSIGHT + PRODUCT — 0:26-0:55] Here's the insight: the strongest evidence a bill is wrong is already sitting in a document the patient already has — their insurance company's own Explanation of Benefits. Upload your bill and your EOB, and in under a minute Gemini reads both, catches exact duplicate charges with zero-false-positive plain logic, cross-references what your insurer already denied against what you're still being billed for, and drafts a dispute letter citing the exact code and reason."
+    "[0:22-0:48 INSIGHT + PRODUCT] Here's what nobody else does: the proof a bill is wrong is already in your hands. When your insurer denies a charge as a duplicate, that's their own ruling, not our opinion. Upload your bill and your EOB, and Gemini reads both, catches exact duplicates deterministically, cross-references what your insurer already denied, and drafts the dispute letter — citing the exact code and reason."
   );
 }
 
-// ---------- Slide 4: How it works ----------
+// ---------- Slide 5: How it works ----------
 {
   const s = lightSlide(doc);
   kicker(s, "The Product");
@@ -198,7 +215,6 @@ const doc = pres();
     s.addText(d, { x, y: 3.0, w: 3.7, h: 1.0, fontFace: FONT_BODY, fontSize: 12.5, color: MUTED, margin: 0, lineSpacingMultiple: 1.25 });
   });
 
-  // Flag-card mockup
   s.addShape("roundRect", { x: 0.6, y: 4.35, w: 11.7, h: 2.15, rectRadius: 0.14, fill: { color: WHITE }, line: { color: "E7E3D9", width: 1 } });
   s.addShape("roundRect", { x: 0.9, y: 4.6, w: 2.0, h: 0.4, rectRadius: 0.2, fill: { color: DANGER_TINT }, line: { type: "none" } });
   s.addText("DUPLICATE CHARGE", { x: 0.9, y: 4.6, w: 2.0, h: 0.4, align: "center", valign: "middle", fontFace: FONT_BODY, bold: true, fontSize: 9.5, color: DANGER, margin: 0 });
@@ -209,11 +225,11 @@ const doc = pres();
   );
   s.addText("CPT 36415  ·  Jul 10, 2026  ·  high confidence", { x: 0.9, y: 5.95, w: 8, h: 0.35, fontFace: FONT_BODY, fontSize: 10.5, color: MUTED, margin: 0 });
 
-  pageNum(s, 4);
-  s.addNotes("(Continued product beat — see slide 3 notes; this slide is visual support for the same 0:26-0:55 segment.)");
+  pageNum(s, 5);
+  s.addNotes("(Continued visual for the 0:22-0:48 beat — this is the actual product, not a mockup.)");
 }
 
-// ---------- Slide 5: Proof it's real ----------
+// ---------- Slide 6: Proof it's real ----------
 {
   const s = lightSlide(doc);
   kicker(s, "Technical Feasibility");
@@ -236,7 +252,6 @@ const doc = pres();
     x: 0.6, y: 5.1, w: 5.9, h: 0.6, fontFace: FONT_BODY, italic: true, fontSize: 11.5, color: MUTED, margin: 0,
   });
 
-  // Stanford CPT table
   s.addText("Real prices, Stanford Health Care's own published data", {
     x: 6.9, y: 2.1, w: 5.5, h: 0.35, fontFace: FONT_BODY, bold: true, fontSize: 13, color: INK, margin: 0,
   });
@@ -252,120 +267,124 @@ const doc = pres();
       r.map((c) => ({
         text: c,
         options: {
-          fontFace: FONT_BODY,
-          fontSize: 11,
-          color: i === 0 ? WHITE : INK,
-          bold: i === 0,
-          fill: { color: i === 0 ? GREEN : i % 2 === 0 ? WHITE : GREEN_TINT },
-          valign: "middle",
+          fontFace: FONT_BODY, fontSize: 11, color: i === 0 ? WHITE : INK, bold: i === 0,
+          fill: { color: i === 0 ? GREEN : i % 2 === 0 ? WHITE : GREEN_TINT }, valign: "middle",
         },
       }))
     ),
     { x: 6.9, y: 2.55, w: 5.5, colW: [1.1, 3.1, 1.3], rowH: 0.42, border: { type: "solid", color: "E7E3D9", pt: 0.75 } }
   );
-  pageNum(s, 5);
-  s.addNotes(
-    "[PROOF — 0:55-1:15] We didn't just prompt this and hope. We ran the full pipeline live against Gemini, wrote an automated test suite, and caught two real bugs before this pitch — including a cross-check that was silently never firing — and fixed both. Every price on our demo bill is real, pulled straight from Stanford Health Care's own federally mandated pricing data."
-  );
-}
-
-// ---------- Slide 6: Market & Business Model ----------
-{
-  const s = lightSlide(doc);
-  kicker(s, "Market Potential & Fundability");
-  title(s, "People already pay for this — slowly");
-
-  statCard(s, 0.6, 2.15, 3.6, 1.7, "100M+", "Americans hold medical debt", GREEN);
-  statCard(s, 4.35, 2.15, 3.6, 1.7, "1.5B", "medical bills issued/year in the US", GOLD);
-  statCard(s, 8.1, 2.15, 4.2, 1.7, "25–35%", "contingency fees existing services already charge", DANGER);
-
-  s.addText("Business model", { x: 0.6, y: 4.15, w: 5, h: 0.4, fontFace: FONT_BODY, bold: true, fontSize: 15, color: INK, margin: 0 });
-  [
-    "Freemium: free bill scan + evidence report",
-    "Success fee on verified, recovered savings",
-    "B2B2C: employer benefits, patient advocacy nonprofits, TPAs",
-  ].forEach((t, i) => {
-    s.addText("• " + t, { x: 0.6, y: 4.65 + i * 0.42, w: 5.9, h: 0.4, fontFace: FONT_BODY, fontSize: 13, color: MUTED, margin: 0 });
-  });
-
-  s.addText("Why now", { x: 7.0, y: 4.15, w: 5, h: 0.4, fontFace: FONT_BODY, bold: true, fontSize: 15, color: INK, margin: 0 });
-  [
-    "CFPB's 2025 rule barring medical debt from credit reports sharpened scrutiny on billing accuracy",
-    "Gemini's document understanding makes a $200/hr patient advocate's job instant and free to start",
-  ].forEach((t, i) => {
-    s.addText("• " + t, { x: 7.0, y: 4.65 + i * 0.62, w: 5.9, h: 0.6, fontFace: FONT_BODY, fontSize: 12.5, color: MUTED, margin: 0, lineSpacingMultiple: 1.2 });
-  });
-
   pageNum(s, 6);
   s.addNotes(
-    "[MARKET — 1:15-1:35] A hundred million Americans carry medical debt. One and a half billion medical bills go out every year. Services that do this by hand already charge 25 to 35 percent contingency fees — people are already paying for this, just slowly. We made it instant."
+    "[0:48-1:05 PROOF] We ran this live against Gemini, wrote 27 automated tests, and fixed two real bugs before this pitch. Every price is real — pulled from Stanford Health Care's own federal pricing data."
   );
 }
 
-// ---------- Slide 7: GTM & Traction ----------
+// ---------- Slide 7: Why ClearBill Wins (differentiation) ----------
 {
   const s = lightSlide(doc);
-  kicker(s, "Go-to-Market Traction");
-  title(s, "Built to spread on its own");
+  kicker(s, "Why ClearBill Wins");
+  title(s, "Not a weekend chatbot wrapper");
 
-  s.addShape("roundRect", { x: 0.6, y: 2.2, w: 5.6, h: 4.2, rectRadius: 0.14, fill: { color: GREEN_DEEP }, line: { type: "none" } });
-  s.addText("“We found $112\nyou don't owe.”", {
-    x: 0.9, y: 2.55, w: 5.0, h: 1.4, fontFace: FONT_HEAD, bold: true, fontSize: 26, color: WHITE, margin: 0, lineSpacingMultiple: 1.15,
-  });
-  s.addText(
-    "The same content shape as viral tax-refund-reveal and settlement-check posts — we built a shareable result card for exactly this moment.",
-    { x: 0.9, y: 4.1, w: 5.0, h: 1.2, fontFace: FONT_BODY, fontSize: 13.5, color: "CFE3D8", margin: 0, lineSpacingMultiple: 1.3 }
-  );
-  s.addText("The hook travels on its own: “49–80% of medical bills contain an error” — alarming, true, citation-backed.", {
-    x: 0.9, y: 5.4, w: 5.0, h: 0.9, fontFace: FONT_BODY, italic: true, fontSize: 12, color: "8FB6A3", margin: 0, lineSpacingMultiple: 1.25,
-  });
-
-  s.addText("Distribution channels already mapped", { x: 6.55, y: 2.2, w: 6, h: 0.4, fontFace: FONT_BODY, bold: true, fontSize: 15, color: INK, margin: 0 });
-  const channels = [
-    "r/personalfinance, r/HealthInsurance",
-    "Patient-advocacy Facebook groups",
-    "Personal-finance creators already covering medical debt",
-    "Employer benefits partnerships — one push reaches thousands of employees at once",
+  const rows = [
+    ["", "Generic AI Chatbot", "Manual Advocate\n(Resolve, GoodBill)", "ClearBill AI"],
+    ["Accuracy", "Can hallucinate", "Accurate (human-reviewed)", "Deterministic — zero false positives"],
+    ["Speed", "Instant", "Days to weeks", "Under 60 seconds"],
+    ["Cost to patient", "Free / cheap", "25–35% contingency fee", "Free to start"],
+    ["Follows through to refund", "No", "Yes", "Yes — on the roadmap"],
   ];
-  channels.forEach((t, i) => {
-    const y = 2.75 + i * 0.85;
-    s.addShape("roundRect", { x: 6.55, y, w: 5.6, h: 0.7, rectRadius: 0.1, fill: { color: WHITE }, line: { color: "E7E3D9", width: 1 } });
-    s.addText(t, { x: 6.8, y, w: 5.1, h: 0.7, valign: "middle", fontFace: FONT_BODY, fontSize: 12.5, color: INK, margin: 0, lineSpacingMultiple: 1.2 });
-  });
+  s.addTable(
+    rows.map((r, i) =>
+      r.map((c, j) => ({
+        text: c,
+        options: {
+          fontFace: FONT_BODY,
+          fontSize: i === 0 ? 12.5 : 12,
+          bold: i === 0 || j === 0 || j === 3,
+          color: i === 0 ? WHITE : j === 3 && i > 0 ? GREEN : INK,
+          fill: { color: i === 0 ? GREEN : j === 3 ? GREEN_TINT : i % 2 === 0 ? WHITE : "F6F5EE" },
+          valign: "middle",
+          align: j === 0 ? "left" : "center",
+        },
+      }))
+    ),
+    { x: 0.6, y: 2.15, w: 11.7, colW: [2.7, 2.9, 3.1, 3.0], rowH: 0.6, border: { type: "solid", color: "E7E3D9", pt: 0.75 } }
+  );
+
+  s.addText(
+    "Every flag is grounded in deterministic logic or the insurer's own official denial code — never a model's guess. And we're building the full loop, from detection to a confirmed refund, not a one-time scan.",
+    { x: 0.6, y: 5.55, w: 11.7, h: 0.9, fontFace: FONT_BODY, fontSize: 14, color: MUTED, italic: true, margin: 0, lineSpacingMultiple: 1.3 }
+  );
 
   pageNum(s, 7);
   s.addNotes(
-    "[TRACTION — 1:35-1:50] And it's built to spread on its own: 'we found $X you don't owe' is the same content shape as every viral tax-refund and settlement-check post — we built a shareable result card for exactly that moment, distributed straight into the communities already talking about this problem."
+    "[1:05-1:25 WHY WE WIN] This isn't a chatbot wrapper. Every flag is grounded in deterministic code or your insurer's own official denial code — never a guess. And we're not building a one-time scanner. We're building the full loop: detect, dispute, follow up, and confirm the refund actually lands — which is the only reason a success fee makes sense."
   );
 }
 
-// ---------- Slide 8: Team + Ask ----------
+// ---------- Slide 8: Market & Go-to-Market ----------
+{
+  const s = lightSlide(doc);
+  kicker(s, "Market Potential & Go-to-Market");
+  title(s, "People already pay for this — slowly");
+
+  statCard(s, 0.6, 2.15, 3.6, 1.5, "100M+", "Americans hold medical debt", GREEN);
+  statCard(s, 4.35, 2.15, 3.6, 1.5, "1.5B", "medical bills issued/year in the US", GOLD);
+  statCard(s, 8.1, 2.15, 4.2, 1.5, "25–35%", "contingency fees existing services already charge", DANGER);
+
+  s.addShape("roundRect", { x: 0.6, y: 3.9, w: 5.6, h: 2.7, rectRadius: 0.14, fill: { color: GREEN_DEEP }, line: { type: "none" } });
+  s.addText("“We found $112\nyou don't owe.”", {
+    x: 0.9, y: 4.1, w: 5.0, h: 1.0, fontFace: FONT_HEAD, bold: true, fontSize: 20, color: WHITE, margin: 0, lineSpacingMultiple: 1.15,
+  });
+  s.addText(
+    "Same content shape as viral tax-refund and settlement-check posts. We built a shareable result card for exactly this moment.",
+    { x: 0.9, y: 5.15, w: 5.0, h: 1.3, fontFace: FONT_BODY, fontSize: 13, color: "CFE3D8", margin: 0, lineSpacingMultiple: 1.3 }
+  );
+
+  s.addText("Distribution already mapped", { x: 6.55, y: 3.9, w: 6, h: 0.35, fontFace: FONT_BODY, bold: true, fontSize: 13.5, color: INK, margin: 0 });
+  [
+    "r/personalfinance, r/HealthInsurance",
+    "Patient-advocacy Facebook groups",
+    "Employer benefits partnerships — 1 deal reaches thousands of employees",
+  ].forEach((t, i) => {
+    const y = 4.35 + i * 0.72;
+    s.addShape("roundRect", { x: 6.55, y, w: 5.6, h: 0.6, rectRadius: 0.1, fill: { color: WHITE }, line: { color: "E7E3D9", width: 1 } });
+    s.addText(t, { x: 6.8, y, w: 5.1, h: 0.6, valign: "middle", fontFace: FONT_BODY, fontSize: 12, color: INK, margin: 0, lineSpacingMultiple: 1.15 });
+  });
+
+  pageNum(s, 8);
+  s.addNotes(
+    "[1:25-1:45 MARKET + GTM] A hundred million Americans carry medical debt. Services that do this by hand already charge 25 to 35 percent — proof people already pay for this, just slowly. And a confirmed refund is inherently shareable: same content shape as every viral tax-refund post, distributed straight into the communities already talking about this."
+  );
+}
+
+// ---------- Slide 9: Ask ----------
 {
   const s = darkSlide(doc);
   kicker(s, "The Ask", "8FB6A3");
   s.addText("Give us two minutes with your bill.", {
-    x: 0.6, y: 1.1, w: 11.5, h: 1.1, fontFace: FONT_HEAD, bold: true, fontSize: 38, color: WHITE, margin: 0,
+    x: 0.6, y: 1.3, w: 11.5, h: 1.1, fontFace: FONT_HEAD, bold: true, fontSize: 38, color: WHITE, margin: 0,
   });
   s.addText("We'll show you exactly what it caught.", {
-    x: 0.6, y: 2.0, w: 11, h: 0.6, fontFace: FONT_BODY, italic: true, fontSize: 18, color: "CFE3D8", margin: 0,
+    x: 0.6, y: 2.2, w: 11, h: 0.6, fontFace: FONT_BODY, italic: true, fontSize: 18, color: "CFE3D8", margin: 0,
   });
 
-  s.addText("Team", { x: 0.6, y: 3.0, w: 5, h: 0.4, fontFace: FONT_BODY, bold: true, fontSize: 14, color: "8FB6A3", margin: 0 });
-  s.addText("[Name] — [role / one line of relevant background]\n[Name] — [role / one line of relevant background]", {
-    x: 0.6, y: 3.4, w: 6, h: 1.0, fontFace: FONT_BODY, fontSize: 14, color: WHITE, margin: 0, lineSpacingMultiple: 1.4,
-  });
-
-  s.addText("Seeking", { x: 0.6, y: 4.6, w: 5, h: 0.4, fontFace: FONT_BODY, bold: true, fontSize: 14, color: "8FB6A3", margin: 0 });
+  s.addText("Seeking", { x: 0.6, y: 3.4, w: 5, h: 0.4, fontFace: FONT_BODY, bold: true, fontSize: 14, color: "8FB6A3", margin: 0 });
   s.addText(
-    "Pitch access to validate detection accuracy against real, anonymized billing datasets and explore integration partnerships with patient advocacy networks and self-insured employers.",
-    { x: 0.6, y: 5.0, w: 8.5, h: 1.0, fontFace: FONT_BODY, fontSize: 13.5, color: "CFE3D8", margin: 0, lineSpacingMultiple: 1.3 }
+    "Not raising today. Thirty minutes with a fund that has real conviction in consumer healthcare fintech — to pressure-test the data-access strategy and the recovery-verification model the success fee depends on.",
+    { x: 0.6, y: 3.8, w: 9.5, h: 1.1, fontFace: FONT_BODY, fontSize: 15, color: "CFE3D8", margin: 0, lineSpacingMultiple: 1.3 }
   );
+
+  s.addText("Team", { x: 0.6, y: 5.2, w: 5, h: 0.4, fontFace: FONT_BODY, bold: true, fontSize: 14, color: "8FB6A3", margin: 0 });
+  s.addText("[Name] · [Name]", {
+    x: 0.6, y: 5.6, w: 6, h: 0.5, fontFace: FONT_BODY, fontSize: 15, color: WHITE, margin: 0,
+  });
 
   s.addText("github.com/LilChainyy/stanford_med", {
     x: 0.6, y: 6.7, w: 8, h: 0.4, fontFace: FONT_BODY, fontSize: 13, color: "8FB6A3",
   });
   s.addNotes(
-    "[CLOSE — 1:50-2:00] We're ClearBill AI. Give us two minutes with your bill, and we'll show you what it caught."
+    "[1:45-2:00 CLOSE] We're ClearBill AI. Give us two minutes with your bill, and we'll show you what it caught."
   );
 }
 

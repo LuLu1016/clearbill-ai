@@ -62,60 +62,69 @@ ready to deploy as-is. Do this in order:
 
 ## 3. Two-Minute Video — Team Intro & Elevator Pitch
 
-Timed script, ~300 words at a natural pace, written so every one of the five
-judging criteria (technical feasibility, innovation, real-world
-applicability, market/fundability, GTM traction) surfaces somewhere in two
-minutes without ever sounding like a checklist. This exact script is also in
-the speaker notes of `pitch_deck/ClearBill_AI_Pitch_Deck.pptx` — one slide
-per beat, present the deck live if you get semi-final/final stage time,
-screen-share it for the recorded video otherwise. Swap `[Name]` /
-`[background]` for real people before recording.
+Timed script, ~300 words at a natural pace. Researched against Y Combinator's
+own pitch guidance and hackathon-judging writeups before rewriting (see
+citations at the bottom of this section) — the previous draft covered all
+five judging criteria but never explained *why this team wins over the
+obvious alternative*, which the research treats as non-negotiable, not
+optional. This version adds that beat explicitly. Matches the 9-slide deck
+in `pitch_deck/ClearBill_AI_Pitch_Deck.pptx` (speaker notes = this script,
+slide-by-slide) — present the deck live if you get semi-final/final stage
+time, screen-share it for the recorded video otherwise. Swap `[Name]` /
+`[background]` for real people before recording, in both the script and the
+deck's slide 3 and slide 9.
 
-**[0:00–0:12] Hook (slide 1 → 2)**
+**[0:00–0:10] Hook (slide 1)**
 > "Between 49 and 80 percent of medical bills in America contain an error.
-> On a $10,000 bill, that's an average $1,300 overcharge — and almost
-> nobody catches it, because nobody has an hour to cross-reference their
+> Nobody catches it, because nobody has an hour to cross-reference their
 > bill against their insurance paperwork by hand."
 
-**[0:12–0:26] Team (slide 2)**
+**[0:10–0:22] Team (slide 3)**
 > "I'm [Name], [background]. This is [Name], [background]. We built
 > ClearBill AI this weekend because we wanted something we'd actually trust
 > our own families to use the next time a bill like this showed up."
 
-**[0:26–0:55] Insight + product — the novelty and how it works (slides 3–4)**
-> "Here's the insight: the strongest evidence a bill is wrong is already
-> sitting in a document the patient already has — their insurance company's
-> own Explanation of Benefits. When an insurer marks a charge 'denied,
-> duplicate,' that's not our opinion, that's the payer's own ruling. Upload
-> your bill and your EOB, and in under a minute Gemini reads both, catches
-> exact duplicate charges with zero-false-positive plain logic,
-> cross-references what your insurer already denied against what you're
-> still being billed for, and drafts a dispute letter citing the exact code
-> and reason."
+**[0:22–0:48] Insight + product (slides 4–5)**
+> "Here's what nobody else does: the proof a bill is wrong is already in
+> your hands. When your insurer denies a charge as a duplicate, that's
+> their own ruling, not our opinion. Upload your bill and your EOB, and
+> Gemini reads both, catches exact duplicates deterministically,
+> cross-references what your insurer already denied, and drafts the
+> dispute letter — citing the exact code and reason."
 
-**[0:55–1:15] Technical feasibility / proof (slide 5)**
-> "We didn't just prompt this and hope. We ran the full pipeline live
-> against Gemini, wrote an automated test suite, and caught two real bugs
-> before this pitch — including a cross-check that was silently never
-> firing — and fixed both. Every price on our demo bill is real, pulled
-> straight from Stanford Health Care's own federally mandated pricing
-> data."
+**[0:48–1:05] Technical feasibility / proof (slide 6)**
+> "We ran this live against Gemini, wrote 27 automated tests, and fixed two
+> real bugs before this pitch. Every price is real — pulled from Stanford
+> Health Care's own federal pricing data."
 
-**[1:15–1:35] Market & fundability (slide 6)**
-> "A hundred million Americans carry medical debt. One and a half billion
-> medical bills go out every year. Services that do this by hand already
-> charge 25 to 35 percent contingency fees — people are already paying for
-> this, just slowly. We made it instant."
+**[1:05–1:25] Why we win — differentiation (slide 7)**
+> "This isn't a chatbot wrapper. Every flag is grounded in deterministic
+> code or your insurer's own official denial code — never a guess. And
+> we're not building a one-time scanner. We're building the full loop:
+> detect, dispute, follow up, and confirm the refund actually lands — which
+> is the only reason a success fee makes sense."
 
-**[1:35–1:50] Go-to-market traction (slide 7)**
-> "And it's built to spread on its own: 'we found $X you don't owe' is the
-> same content shape as every viral tax-refund and settlement-check post —
-> we built a shareable result card for exactly that moment, distributed
-> straight into the communities already talking about this problem."
+**[1:25–1:45] Market & go-to-market (slide 8)**
+> "A hundred million Americans carry medical debt. Services that do this by
+> hand already charge 25 to 35 percent — proof people already pay for this,
+> just slowly. And a confirmed refund is inherently shareable: same content
+> shape as every viral tax-refund post, distributed straight into the
+> communities already talking about this."
 
-**[1:50–2:00] Close (slide 8)**
+**[1:45–2:00] Close (slide 9)**
 > "We're ClearBill AI. Give us two minutes with your bill, and we'll show
 > you what it caught."
+
+Research this version is built on: [Y Combinator — How to Pitch Your
+Company](https://www.ycombinator.com/library/4b-how-to-pitch-your-company)
+("lead with strength," cap yourself at 5–6 memorable points, the
+two-sentence test), [Y Combinator — Guide to Demo Day
+Presentations](https://www.ycombinator.com/blog/guide-to-demo-day-pitches/),
+[Devpost — 6 Tips for a Winning Hackathon Demo
+Video](https://info.devpost.com/blog/6-tips-for-making-a-hackathon-demo-video)
+(a confusing strong project loses to a simple one judges understand),
+[JetBrains — How to Win a Hackathon: Notes From the Judging
+Table](https://blog.jetbrains.com/ai/2026/06/how-to-win-a-hackathon-notes-from-the-judging-table/).
 
 ---
 
